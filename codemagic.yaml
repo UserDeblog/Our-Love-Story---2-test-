@@ -9,7 +9,6 @@ workflows:
     scripts:
       - name: Instalar dependências e sincronizar o app
         script: |
-          npm install --global pnpm@11.25.0
           pnpm install --frozen-lockfile
           pnpm run cap:sync
       - name: Compilar app iOS sem assinatura
