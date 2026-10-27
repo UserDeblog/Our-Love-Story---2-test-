@@ -2,6 +2,7 @@
   "name": "our-love-story-app",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@11.25.0",
   "description": "Our Love Story mobile app built with Capacitor",
   "scripts": {
     "build": "node scripts/build-web.mjs",
