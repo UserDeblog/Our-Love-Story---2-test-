@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>Our Love Chronicle</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.css">
+
+    <link rel="stylesheet" href="style.css?v=20261014-gallery-refresh">
+</head>
+
+<body class="intro-active">
+
+<section id="loveIntro" class="love-intro" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+    <div class="intro-glow intro-glow-one"></div>
+    <div class="intro-glow intro-glow-two"></div>
+    <svg class="intro-heart intro-heart-one" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="introHeartRose" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1f4"/><stop offset="1" stop-color="#e98ba2"/></linearGradient></defs><path d="M50 87 14 52C-7 27 22 1 46 22l4 5 5-5C79 1 107 28 86 52L50 87Z" fill="url(#introHeartRose)"/></svg>
+    <svg class="intro-heart intro-heart-two" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 87 14 52C-7 27 22 1 46 22l4 5 5-5C79 1 107 28 86 52L50 87Z" fill="#fff7f8" stroke="#e7a6b5" stroke-width="3"/></svg>
+    <svg class="intro-heart intro-heart-three" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 87 14 52C-7 27 22 1 46 22l4 5 5-5C79 1 107 28 86 52L50 87Z" fill="#efb3c0"/></svg>
+
+    <div class="intro-card">
+        <div class="intro-seal" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M50 84 18 54C-2 34 22 8 44 28l6 6 6-6c22-20 46 6 26 26L50 84Z"/></svg></div>
+        <span class="intro-kicker">A SPECIAL EDITION</span>
+        <div class="intro-rule"><span>✦</span></div>
+        <p class="intro-note">THE STORY OF US</p>
+        <h1 id="introTitle">The story of our lives </h1>
+        <p class="intro-message">Here is everything I've saved from our journey together.</p>
+        <button id="enterLoveSite" class="intro-enter-button" type="button">
+            <span>Enter our story</span>
+            <span class="intro-enter-arrow" aria-hidden="true">→</span>
+        </button>
+        <span class="intro-footer">MADE WITH LOVE, FOR SAMUCA, FOR ETERNITY</span>
+    </div>
+</section>
+
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+
+    <div class="top-bar">
+        <span id="currentDate"></span>
+    </div>
+
+    <div class="header-main">
+
+        <div class="logo">
+            <span class="logo-small">THE</span>
+            <h1>Our Love Chronicle</h1>
+            <span class="logo-subtitle">
+                The story of our lives.
+            </span>
+        </div>
+
+        <div class="love-counter">
+            <span>TOGETHER FOR</span>
+            <strong id="loveCounter">5 MONTHS · 29 DAYS</strong>
+            <small id="loveCounterTime">00 HOURS · 00 MINUTES · 00 SECONDS</small>
+        </div>
+
+    </div>
+
+    <nav class="navigation">
+
+        <button class="nav-btn active" data-page="home">
+            PRINCIPAL
+        </button>
+
+        <button class="nav-btn" data-page="photos">
+            OUR PHOTOS
+        </button>
+
+        <button class="nav-btn" data-page="timeline">
+            TIMELINE
+        </button>
+
+        <button class="nav-btn" data-page="news">
+            DAILY NEWS
+        </button>
+
+        <button class="nav-btn" data-page="our-plans">
+            OUR PLANS
+        </button>
+
+    </nav>
+
+</header>
+
+
+<!-- ================= MAIN ================= -->
+
+<main>
+
+
+<!-- ================= HOME ================= -->
+
+<section id="home" class="page active-page">
+
+    <div class="breaking-news">
+        <span class="breaking-label">LOVE NEWS:</span>
+
+        <div class="breaking-text">
+            <span id="breakingNews">
+                URGENTE: Jesus aprovou passarem a Eternidades juntos.
+            </span>
+        </div>
+    </div>
+
+
+    <section class="hero">
+
+        <article class="main-story">
+
+            <div class="image-container">
+                <img id="memoryImage" src="images/foto30.jpeg" alt="Nosso momento">
+                <video id="memoryVideo" muted playsinline loop hidden></video>
+                <button class="memory-arrow memory-previous" type="button" aria-label="Foto anterior" onclick="showMemory(memoryIndex - 1)">‹</button>
+                <button class="memory-arrow memory-next" type="button" aria-label="Próxima foto" onclick="showMemory(memoryIndex + 1)">›</button>
+                <div id="memoryDots" class="memory-dots" aria-label="Selecionar lembrança"></div>
+            </div>
+
+            <div class="story-content">
+
+                <span id="memoryDate" class="date">LEMBRANÇA 1 DE 6</span>
+
+                <h2 id="memoryTitle">UM DOS DIAS QUE NOS PASSAMOS MAIS TEMPO JUNTOS</h2>
+
+                <p id="memoryComment">
+                    Dizem que alguns minutos mudam tudo, e mudam mesmo.
+                    A nossa realidade se transforma em momentos quando passamos tempo de qualidade juntos.
+                </p>
+
+                <button class="read-more" onclick="openPage('timeline')">
+                    Ver a nossa linha do tempo  →
+                </button>
+
+            </div>
+
+        </article>
+
+
+        <aside class="side-stories">
+
+            <article class="small-story">
+
+                <img src="images/foto1.jpg" alt="Momento especial">
+
+                <div>
+                    <span class="category-text">
+                        LOVE
+                    </span>
+
+                    <h3>
+                        Vimos o por do sol juntos.
+                    </h3>
+
+                    <p>
+                        Foi o dia mais incrível das nossas vidas. vimos o por do sol juntos, me fala se isso vai acontecer dnv?
+                        Porque até os dias comuns viram especiais
+                        quando estou junto com ela.
+                    </p>
+                </div>
+
+            </article>
+
+
+            <article class="small-story">
+
+                <img src="images/foto4.jpg" alt="Momento juntos">
+
+                <div>
+                    <span class="category-text">
+                        EXCLUSIVE
+                    </span>
+
+                    <h3>
+                        Passamos a noite juntos, foi muito engraçado esse dia kk.
+                    </h3>
+
+                    <p>
+                        Passamos a noite juntos, e fingimos que eramos niggas das trincheiras das favelas durante a volta.
+                    </p>
+
+                </div>
+
+            </article>
+
+        </aside>
+
+    </section>
+
+
+    <!-- MOMENTOS -->
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <div>
+                <span class="section-label">
+                    OUR ARCHIVE
+                </span>
+
+                <h2>
+                    Latest Moments
+                </h2>
+            </div>
+
+            <button onclick="openPage('photos')">
+                VER TUDO →
+            </button>
+
+        </div>
+
+
+        <div class="moment-grid">
+
+            <article class="moment-card">
+
+                <img src="images/foto5.jpg" alt="Momento">
+
+                <div class="moment-info">
+                    <span>MEMORY • 2026</span>
+
+                    <h3>
+                       Um dos dias mais legais juntos na igreja
+                    </h3>
+
+                    <p>
+                        A gente passou o dia juntos,
+                    </p>
+                </div>
+
+            </article>
+
+
+            <article class="moment-card">
+
+                <img src="images/foto2.jpg" alt="Momento">
+
+                <div class="moment-info">
+                    <span>LOVE • 2026</span>
+
+                    <h3>
+                        Outra foto do por do sol, sem duvidas um dos dias mais incriveis juntos.
+                    </h3>
+
+                    <p>
+                        Amo passar meu tempo com ela, cada segundo pra mim vale tudo.
+                    </p>
+                </div>
+
+            </article>
+
+
+            <article class="moment-card">
+
+                <img src="images/foto3.jpg" alt="Momento">
+
+                <div class="moment-info">
+                    <span>US • 2026</span>
+
+                    <h3>
+                        Primeira vez depois da colportagem
+                    </h3>
+
+                    <p>
+                        Eu tinha voltado da colportagem e esse foi o primeiro momento nosso que se vimos.
+                    </p>
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- FRASE -->
+
+    <section class="quote-section">
+
+        <div class="quote-mark">“</div>
+
+        <blockquote>
+            O mundo tem bilhões de histórias,
+            mas eu escolheria viver a nossa
+            em todas elas.
+        </blockquote>
+
+        <span>
+            — OUR LOVE CHRONICLE
+        </span>
+
+    </section>
+
+
+    <!-- NEWS PREVIEW -->
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <div>
+                <span class="section-label">
+                    DAILY JOURNAL
+                </span>
+
+                <h2>
+                    Today's News
+                </h2>
+            </div>
+
+            <button onclick="openPage('news')">
+                ALL NEWS →
+            </button>
+
+        </div>
+
+
+        <div id="homeNews" class="news-list"></div>
+
+    </section>
+
+</section>
+
+
+
+<!-- ================= PHOTOS ================= -->
+
+<section id="photos" class="page">
+
+    <div class="page-header">
+
+        <span>OUR COLLECTION</span>
+
+        <h2>
+            Our photos
+        </h2>
+
+        <p>
+            Cada foto guarda uma memoria juntos.
+        </p>
+
+    </div>
+
+
+    <div class="photo-filters">
+
+        <button class="photo-filter active" type="button" data-filter="all">
+            All
+        </button>
+
+        <button class="photo-filter" type="button" data-filter="us">
+            Us
+        </button>
+
+        <button class="photo-filter" type="button" data-filter="dates">
+            Dates 
+        </button>
+
+        <button class="photo-filter" type="button" data-filter="special-days">
+            Special days
+        </button>
+
+        <button class="photo-filter" type="button" data-filter="videos">
+            Videos
+        </button>
+
+        <label class="gallery-sort-control" for="gallerySortOrder">Ordenar
+            <select id="gallerySortOrder" aria-label="Ordenar fotos">
+                <option value="newest">Mais recentes</option>
+                <option value="oldest">Mais antigas</option>
+            </select>
+        </label>
+
+    </div>
+
+
+    <div class="gallery">
+
+    </div>
+    <nav id="galleryPagination" class="gallery-pagination" aria-label="Paginação da galeria"></nav>
+
+    <div class="gallery-admin-tools">
+        <h3>Organizar galeria</h3>
+        <p id="galleryAdminMessage">Entra como ADM para mudar as fotos.</p>
+        <div id="galleryAdminLogin">
+            <input type="email" id="galleryAdminEmail" autocomplete="username" placeholder="E-mail do administrador">
+            <input type="password" id="galleryAdminPassword" autocomplete="current-password" placeholder="Senha">
+            <button type="button" onclick="loginGalleryAdmin()">Entrar como ADM</button>
+        </div>
+        <button id="galleryAdminLogout" type="button" onclick="logoutGalleryAdmin()" hidden>Sair da conta</button>
+        <p id="galleryAdminStatus" class="upload-status" role="status" aria-live="polite"></p>
+    </div>
+
+</section>
+
+
+
+<!-- ================= TIMELINE ================= -->
+
+<section id="timeline" class="page">
+
+    <div class="page-header">
+
+        <span>OUR HISTORY</span>
+
+        <h2>
+            The Timeline
+        </h2>
+
+        <p>
+            Every chapter brought us here.
+        </p>
+
+    </div>
+
+
+    <div class="timeline-shell">
+        <div class="timeline-controls" aria-label="Controles da timeline">
+            <span>UMA HISTÓRIA EM CAPÍTULOS</span>
+            <div>
+                <button id="addTimelineChapter" class="timeline-add-button" type="button">+ Novo capítulo</button>
+                <button type="button" data-timeline-scroll="-1" aria-label="Ver capítulos anteriores">←</button>
+                <button type="button" data-timeline-scroll="1" aria-label="Ver próximos capítulos">→</button>
+            </div>
+        </div>
+        <form id="timelineChapterForm" class="timeline-editor" hidden>
+            <div class="timeline-editor-heading"><div><span class="section-label">NOVO CAPÍTULO</span><h3>Guardar mais uma lembrança</h3></div><button id="cancelTimelineEdit" type="button" aria-label="Fechar formulário">×</button></div>
+            <div class="timeline-editor-fields">
+                <label>Nome do capítulo<input id="timelineTitleInput" maxlength="80" required placeholder="Ex.: Nosso primeiro show"></label>
+                <label>Data<input id="timelineDateInput" type="date" required></label>
+                <label class="timeline-comment-field">Comentário<textarea id="timelineCommentInput" maxlength="500" required placeholder="Conte por que esse momento é especial"></textarea></label>
+            </div>
+            <div class="timeline-photo-row"><button id="chooseTimelinePhoto" type="button" class="place-photo-picker">♡ Escolher foto da galeria</button><span id="timelinePhotoName" class="place-photo-name">Nenhuma foto selecionada</span><img id="timelinePhotoPreview" alt="Prévia da foto escolhida" hidden></div>
+            <input id="timelinePhotoUrl" type="hidden">
+            <div class="timeline-editor-actions"><p id="timelineEditorStatus" role="status" aria-live="polite"></p><div class="timeline-editor-action-buttons"><button id="deleteTimelineChapter" class="timeline-delete-button" type="button" hidden>Apagar capítulo</button><button type="submit">Salvar capítulo</button></div></div>
+        </form>
+        <p id="timelineSaveStatus" class="timeline-save-status" role="status" aria-live="polite"></p>
+        <div class="timeline" id="timelineTrack">
+
+
+        <div class="timeline-item">
+
+            <div class="timeline-date">
+                May 2026
+            </div>
+
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-card">
+
+                <img src="images/foto8.jpg" alt="Começo">
+
+                <div>
+
+                    <span>
+                        CHAPTER 01
+                    </span>
+
+                    <h3>
+                        THE BEGINNING
+                    </h3>
+
+                    <p>
+                        Primeira vez que saimos juntos, para longe, e foi o começo de tudo.
+                    </p>
+                    <button class="timeline-location" type="button" onclick="openPage('our-plans')" aria-label="Abrir nosso mapa para marcar o local desta lembrança">
+                        <span class="timeline-globe" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><path d="M4 24h40M24 3c7 6 10 13 10 21S31 39 24 45M24 3c-7 6-10 13-10 21s3 15 10 21M8 12h32M8 36h32"/></svg><i>♥</i></span>
+                        <span><strong>LOCAL DA LEMBRANÇA</strong><small>Marcar no nosso mapa <b>↗</b></small></span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="timeline-item">
+
+            <div class="timeline-date">
+                May 2026
+            </div>
+
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-card">
+
+                <img src="images/foto7.jpg" alt="Primeiros momentos">
+
+                <div>
+
+                    <span>
+                        CHAPTER 02
+                    </span>
+
+                    <h3>
+                        GETTING CLOSER
+                    </h3>
+
+                    <p>
+                        Cada conversa, cada encontro e cada pequeno
+                        momento começou a construir nossa história.
+                    </p>
+                    <button class="timeline-location" type="button" onclick="openPage('our-plans')" aria-label="Abrir nosso mapa para marcar o local desta lembrança">
+                        <span class="timeline-globe" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><path d="M4 24h40M24 3c7 6 10 13 10 21S31 39 24 45M24 3c-7 6-10 13-10 21s3 15 10 21M8 12h32M8 36h32"/></svg><i>♥</i></span>
+                        <span><strong>LOCAL DA LEMBRANÇA</strong><small>Marcar no nosso mapa <b>↗</b></small></span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="timeline-item">
+
+            <div class="timeline-date">
+                 July 2026
+            </div>
+
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-card">
+
+                <img src="images/foto3.jpg" alt="Nossa história">
+
+                <div>
+
+                    <span>
+                        CHAPTER 03
+                    </span>
+
+                    <h3>
+                        OUR STORY
+                    </h3>
+
+                    <p>
+                        O que começou como uma história se tornou
+                        parte da nossa vida.
+                    </p>
+                    <button class="timeline-location" type="button" onclick="openPage('our-plans')" aria-label="Abrir nosso mapa para marcar o local desta lembrança">
+                        <span class="timeline-globe" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><path d="M4 24h40M24 3c7 6 10 13 10 21S31 39 24 45M24 3c-7 6-10 13-10 21s3 15 10 21M8 12h32M8 36h32"/></svg><i>♥</i></span>
+                        <span><strong>LOCAL DA LEMBRANÇA</strong><small>Marcar no nosso mapa <b>↗</b></small></span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="timeline-item">
+
+            <div class="timeline-date">
+                TODAY
+            </div>
+
+            <div class="timeline-dot"></div>
+
+            <div class="timeline-card future">
+
+                <div class="future-icon">
+                    ♥
+                </div>
+
+                <div>
+
+                    <span>
+                        CHAPTER 04
+                    </span>
+
+                    <h3>
+                        TO BE CONTINUED...
+                    </h3>
+
+                    <p>
+                        Essa história ainda está sendo escrita.
+                        E talvez essa seja a parte mais bonita.
+                    </p>
+                    <button class="timeline-next-step" type="button" onclick="openPage('our-plans')">Escolher nosso próximo capítulo <span>→</span></button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        </div>
+    </div>
+
+    <section class="date-roulette" aria-labelledby="dateRouletteTitle">
+        <div class="date-roulette-copy"><span class="section-label">Sorteio de coisas para fazer</span><h3 id="dateRouletteTitle">Roleta de dates</h3><p>A sorte vai escolher por nós.</p><div id="dateRouletteResult" class="date-roulette-result" aria-live="polite">Gire a roleta para descobrir</div><button id="spinDateRoulette" type="button">Girar a roleta <span>↗</span></button>
+            <div class="date-idea-manager"><h4>Nossas ideias</h4><form id="dateIdeaForm"><input id="dateIdeaInput" maxlength="90" placeholder="Adicionar uma ideia de encontro" required><button id="saveDateIdea" type="submit">Adicionar</button><button id="cancelDateIdeaEdit" type="button" hidden>Cancelar</button></form><p id="dateIdeaStatus" aria-live="polite"></p><ul id="dateIdeaList" aria-label="Ideias salvas para a roleta"></ul></div>
+        </div>
+        <div class="date-wheel-wrap"><div id="dateWheel" class="date-wheel" role="img" aria-label="Roleta com ideias de encontros"><span class="wheel-center">♥</span></div><span class="wheel-pointer" aria-hidden="true">▼</span></div>
+    </section>
+
+</section>
+
+<dialog id="timelinePhotoDialog" class="timeline-photo-dialog" aria-labelledby="timelinePhotoDialogTitle"><div class="timeline-photo-dialog-head"><div><span class="section-label">OUR PHOTOS</span><h2 id="timelinePhotoDialogTitle">Escolha uma lembrança</h2></div><button type="button" id="closeTimelinePhotoDialog" aria-label="Fechar galeria">×</button></div><div id="timelinePhotoChoices" class="timeline-photo-choices"></div></dialog>
+
+
+
+<!-- ================= DAILY NEWS ================= -->
+
+<section id="news" class="page">
+
+    <div class="page-header">
+
+        <span>THE DAILY EDITION</span>
+
+        <h2>
+            Daily News
+        </h2>
+
+        <p>
+            Everything that happened in our little world.
+        </p>
+
+    </div>
+
+
+    <div class="news-upload-layout">
+        <section class="news-upload-panel">
+            <div class="plan-panel-heading">
+                <span class="section-label">NOSSAS HISTÓRIAS</span>
+                <h3>📝 Add Today's News</h3>
+                <p>Notícias ficam salvas para todos. Entre como administrador em “Nossas Fotos” para editar ou apagar.</p>
+            </div>
+            <div class="news-upload-form">
+                <input type="text" id="newsTitle" placeholder="Título da notícia">
+                <textarea id="newsDescription" placeholder="O que aconteceu hoje?"></textarea>
+                <button id="saveNewsButton" type="button" onclick="addNews()">PUBLISH NEWS</button>
+                <button id="cancelNewsEdit" type="button" onclick="cancelNewsEdit()" hidden>CANCEL EDIT</button>
+                <p id="newsStatus" class="upload-status" role="status" aria-live="polite"></p>
+            </div>
+        </section>
+
+        <section class="news-upload-panel">
+            <div class="plan-panel-heading">
+                <span class="section-label">NOSSAS LEMBRANÇAS</span>
+                <h3>Guardar uma foto ou vídeo</h3>
+                <p>Novas lembranças aparecerão na galeria para todos que acessarem o site.</p>
+            </div>
+            <div class="news-upload-form">
+                <span class="upload-label">Escolha uma foto ou vídeo</span>
+                <div class="memory-file-picker-row">
+                    <label class="place-photo-picker memory-file-picker" for="memoryFile">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                        <span>Escolher arquivo</span>
+                    </label>
+                    <input class="memory-file-input" type="file" id="memoryFile" accept="image/*,video/*" aria-label="Escolher uma foto ou vídeo">
+                    <span id="memoryFileName" class="place-photo-name">Nenhum arquivo escolhido</span>
+                </div>
+                <input type="text" id="memoryUploadTitle" maxlength="100" placeholder="Título para o carrossel (opcional)">
+                <textarea id="memoryUploadSubtitle" maxlength="300" placeholder="Legenda do carrossel (opcional; sem legenda, a foto aparece só na galeria)"></textarea>
+                <input type="hidden" id="memoryUploadCategory" value="us">
+                <button id="uploadMemoryButton" class="memory-upload-button" type="button" onclick="addMemoryUpload()">Adicionar à galeria</button>
+                <p id="uploadStatus" class="upload-status" role="status" aria-live="polite"></p>
+            </div>
+        </section>
+    </div>
+
+
+    <div id="allNews" class="news-list large"></div>
+    <nav id="newsPagination" class="gallery-pagination" aria-label="Paginação das notícias"></nav>
+
+</section>
+
+<!-- ================= NOSSA HISTÓRIA JUNTOS ================= -->
+
+<section id="our-plans" class="page">
+    <div class="page-header">
+        <span>OUR NEXT CHAPTERS</span>
+        <h2>Nossos planos</h2>
+        <p>Cartas para o futuro, lugares para conhecer e coisas para viver juntos.</p>
+    </div>
+
+    <div class="plans-layout">
+        <section class="plan-panel letters-panel">
+            <div class="plan-panel-heading">
+                <span class="section-label">PALAVRAS GUARDADAS</span>
+                <h3>Cartinhas &amp; cápsula do tempo</h3>
+                <p>Mensagens para abrir agora e palavras guardadas para o futuro.</p>
+            </div>
+            <div class="plan-subnav" role="tablist" aria-label="Mensagens para nós">
+                <button class="plan-subtab active" id="lettersTab" type="button" role="tab" aria-selected="true" aria-controls="lettersPanel">Cartinhas</button>
+                <button class="plan-subtab" id="capsulesTab" type="button" role="tab" aria-selected="false" aria-controls="capsulesPanel">Cápsula do tempo</button>
+            </div>
+            <section id="lettersPanel" class="plan-subpanel" role="tabpanel" aria-labelledby="lettersTab">
+                <p class="plan-panel-hint">Abra uma cartinha para ler a mensagem inteira e ver os detalhes.</p>
+                <form id="letterForm" class="plan-form">
+                    <input id="letterTitle" type="text" maxlength="90" placeholder="Título da cartinha" required>
+                    <textarea id="letterMessage" maxlength="4000" placeholder="Escreva uma cartinha…" required></textarea>
+                    <div class="plan-form-row">
+                        <label for="letterOpenDate">Abrir em (opcional)
+                            <input id="letterOpenDate" type="date">
+                        </label>
+                        <label for="letterAuthor">De
+                            <select id="letterAuthor">
+                                <option value="Nós dois">Nós dois</option>
+                                <option value="Samuel">Samuel</option>
+                                <option value="Gabi">Gabi</option>
+                            </select>
+                        </label>
+                    </div>
+                    <fieldset class="letter-permissions" id="letterPermissions">
+                        <legend>Permissões desta cartinha (admin)</legend>
+                        <label><input id="letterCanEdit" type="checkbox" checked> Pode ser editada</label>
+                        <label><input id="letterCanDelete" type="checkbox" checked> Pode ser apagada</label>
+                    </fieldset>
+                    <button id="saveLetterButton" type="submit">GUARDAR CARTINHA ♥</button>
+                    <button id="cancelLetterEdit" class="secondary-plan-button" type="button" hidden>Cancelar edição</button>
+                    <p id="letterStatus" class="upload-status" role="status" aria-live="polite"></p>
+                </form>
+                <div id="lettersList" class="letters-list" aria-live="polite"></div>
+            </section>
+            <section id="capsulesPanel" class="plan-subpanel" role="tabpanel" aria-labelledby="capsulesTab" hidden>
+                <p class="capsule-lock-note">🔒 O texto da cápsula é privado: só aparece para o administrador, e apenas depois da data de abertura.</p>
+                <div id="capsuleAdminGate" class="capsule-admin-gate">
+                    <p>Entre no modo administrador para criar cápsulas ou ler as que já chegaram à data.</p>
+                    <button id="goToAdminLogin" class="secondary-plan-button" type="button">IR PARA O LOGIN DE ADMIN</button>
+                </div>
+                <form id="capsuleForm" class="plan-form capsule-form" hidden>
+                    <h4>Guardar uma cápsula do tempo</h4>
+                    <input id="capsuleTitle" type="text" maxlength="90" placeholder="Título da cápsula" required>
+                    <textarea id="capsuleMessage" maxlength="6000" placeholder="O que você quer que o futuro de vocês leia?" required></textarea>
+                    <div class="plan-form-row">
+                        <label for="capsuleOpenDate">Abrir em
+                            <input id="capsuleOpenDate" type="date" required>
+                        </label>
+                        <label for="capsuleAuthor">De
+                            <select id="capsuleAuthor">
+                                <option value="Nós dois">Nós dois</option>
+                                <option value="Samuel">Samuel</option>
+                                <option value="Gabi">Gabi</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="capsule-date-shortcuts" aria-label="Atalhos para data de abertura">
+                        <button type="button" data-capsule-years="1">Daqui a 1 ano</button>
+                        <button type="button" data-capsule-years="5">Daqui a 5 anos</button>
+                        <button type="button" data-capsule-years="10">Daqui a 10 anos</button>
+                    </div>
+                    <button id="saveCapsuleButton" type="submit">SELAR CÁPSULA 🔒</button>
+                    <p id="capsuleStatus" class="upload-status" role="status" aria-live="polite"></p>
+                </form>
+                <div id="capsulesList" class="letters-list" aria-live="polite"></div>
+            </section>
+        </section>
+
+        <section class="plan-panel map-panel">
+            <div class="plan-panel-heading">
+                <span class="section-label">NOSSO MAPA</span>
+                <h3>Já fomos &amp; queremos ir</h3>
+                <p>Explore o globo, marque os lugares de vocês e guarde uma foto junto com cada lembrança.</p>
+            </div>
+            <div id="loveMap" class="love-map" role="application" aria-label="Mapa interativo do mundo. Toque para selecionar um lugar.">
+                <div id="loveMapCanvas" class="love-map-canvas"></div>
+                <div id="mapLoading" class="map-loading" role="status">Carregando o globo…</div>
+                <button id="mapGoTaubate" class="map-focus-button" type="button" title="Voltar para Taubaté">⌖ Taubaté</button>
+                <button id="mapFullscreenButton" class="map-fullscreen-button" type="button" aria-pressed="false">⛶ Tela cheia</button>
+            </div>
+            <form id="placeForm" class="plan-form place-form">
+                <input id="placeName" type="text" maxlength="100" placeholder="Nome do lugar (ex.: Paris, França)" required>
+                <div class="address-search">
+                    <label for="placeAddress">Buscar endereço ou cidade para mover o ponto
+                        <input id="placeAddress" type="search" maxlength="150" placeholder="Ex.: Rio de Janeiro, RJ">
+                    </label>
+                    <button id="searchPlaceAddress" type="button">BUSCAR NO MAPA</button>
+                    <div id="addressResultsWrap" hidden>
+                        <label for="addressResults">Escolha o resultado
+                            <select id="addressResults"></select>
+                        </label>
+                    </div>
+                    <p id="addressSearchStatus" role="status" aria-live="polite">Busca pelo OpenStreetMap. Não inclua endereço residencial exato ou dados pessoais. © OpenStreetMap contributors.</p>
+                </div>
+                <div class="plan-form-row">
+                    <label for="placeKind">Esse lugar…
+                        <select id="placeKind"><option value="dream">é um sonho ✨</option><option value="visited">já visitamos ♥</option></select>
+                    </label>
+                    <label for="placeDate">Data (opcional)
+                        <input id="placeDate" type="date">
+                    </label>
+                </div>
+                <div class="place-photo-picker-row">
+                    <span class="place-photo-label">Foto do lugar <small>(opcional)</small></span>
+                    <label class="place-photo-picker" for="placePhoto">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                        <span>Escolher foto</span>
+                    </label>
+                    <input id="placePhoto" class="place-photo-input" type="file" accept="image/*" aria-label="Escolher foto deste lugar">
+                    <span id="placePhotoName" class="place-photo-name">Nenhuma foto escolhida</span>
+                </div>
+                <span id="placeCoordinates" class="place-coordinate-hint">Toque no globo para escolher onde fica o lugar. Um ponto inicial já está marcado em Taubaté.</span>
+                <button id="savePlaceButton" type="submit">ADICIONAR AO MAPA</button>
+                <button id="cancelPlaceEdit" class="secondary-plan-button" type="button" hidden>Cancelar edição</button>
+                <p id="placeStatus" class="upload-status" role="status" aria-live="polite">Taubaté já está selecionada como ponto inicial.</p>
+            </form>
+            <div class="map-legend"><span>♥ Já fomos</span><span>✦ Queremos ir</span></div>
+            <div id="placesList" class="places-list" aria-live="polite"></div>
+        </section>
+
+        <section class="plan-panel checklist-panel">
+            <div class="plan-panel-heading">
+                <span class="section-label">COISAS PARA VIVER</span>
+                <h3>Antes de namorar</h3>
+                <p>Uma checklist compartilhada para acompanhar essa lista especial.</p>
+            </div>
+            <form id="checklistForm" class="plan-form checklist-form">
+                <input id="checklistText" type="text" maxlength="180" placeholder="Adicionar uma coisa da lista…" required>
+                <button type="submit">ADICIONAR À LISTA +</button>
+            </form>
+            <div class="checklist-progress"><span id="checklistProgress">0 de 0 concluídos</span><div class="progress-track"><span id="checklistProgressBar"></span></div></div>
+            <ul id="checklistItems" class="checklist-items" aria-live="polite"></ul>
+        </section>
+    </div>
+</section>
+
+</main>
+
+
+
+<!-- ================= IMAGE MODAL ================= -->
+
+<div id="imageModal" class="image-modal">
+
+    <button class="modal-gallery-nav modal-gallery-previous" type="button" aria-label="Foto anterior" hidden>‹</button>
+    <button class="modal-gallery-nav modal-gallery-next" type="button" aria-label="Próxima foto" hidden>›</button>
+    <span id="modalGalleryPosition" class="modal-gallery-position" aria-live="polite"></span>
+
+    <button class="close-modal" onclick="closeImage()">
+        ×
+    </button>
+
+    <img id="modalImage" src="" alt="Imagem ampliada">
+    <video id="modalVideo" controls playsinline hidden></video>
+
+</div>
+
+<div id="letterDetailModal" class="letter-detail-overlay" role="dialog" aria-modal="true" aria-labelledby="letterDetailTitle" hidden>
+    <article class="letter-detail-card">
+        <button id="closeLetterDetail" class="letter-detail-close" type="button" aria-label="Fechar cartinha">×</button>
+        <span class="section-label">UMA CARTINHA DE VOCÊS</span>
+        <h2 id="letterDetailTitle"></h2>
+        <div id="letterDetailMeta" class="letter-detail-meta"></div>
+        <div id="letterDetailBody" class="letter-detail-body"></div>
+        <div id="letterDetailActions" class="letter-detail-actions"></div>
+    </article>
+</div>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <div class="footer-logo">
+        OUR LOVE CHRONICLE
+    </div>
+
+    <p>
+        A newspaper about two people, gabii and samuel,
+        countless memories and one story.
+    </p>
+
+    <span>
+        EST. 2026 • MADE WITH LOVE BY SAMUCA♥
+    </span>
+
+</footer>
+
+<div class="floating-action-stack">
+    <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Ativar modo escuro" title="Alternar modo claro e escuro"><span aria-hidden="true">☾</span></button>
+<aside id="musicMixer" class="music-mixer is-collapsed" aria-label="Mixer de música de fundo">
+    <div id="musicMixerPanel" class="music-mixer-panel" aria-hidden="true">
+        <div class="music-mixer-heading">
+            <span class="music-mixer-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M4 10v4m4-8v12m4-16v20m4-15v10m4-7v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <div>
+                <strong>OUR LOVE RADIO</strong>
+                <small id="musicStatus" aria-live="polite">Música de fundo</small>
+            </div>
+        </div>
+        <label class="sr-only" for="musicPlaylistSelect">Escolher playlist</label>
+        <select id="musicPlaylistSelect" aria-label="Escolher playlist"></select>
+        <label class="sr-only" for="musicTrackSelect">Escolher música</label>
+        <select id="musicTrackSelect" aria-label="Escolher música"></select>
+        <nav id="musicPagination" class="music-pagination" aria-label="Páginas de músicas"></nav>
+        <div class="music-controls">
+            <button id="musicPrevious" type="button" aria-label="Música anterior" title="Música anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M19 6 9 12l10 6V6Z"/></svg></button>
+            <button id="musicPlayPause" class="music-play-button" type="button" aria-label="Tocar música" title="Tocar música"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 10 6-10 6V6Z"/></svg></button>
+            <button id="musicNext" type="button" aria-label="Próxima música" title="Próxima música"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M5 6l10 6-10 6V6Z"/></svg></button>
+            <label class="volume-control" for="musicVolume" title="Volume">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Zm12-2a6 6 0 0 1 0 8m2-11a10 10 0 0 1 0 14"/></svg>
+                <input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.35" aria-label="Volume da música">
+            </label>
+        </div>
+    </div>
+    <button id="musicMixerToggle" class="music-mixer-toggle" type="button" aria-label="Abrir mixer de música" aria-expanded="false" aria-controls="musicMixerPanel" title="Abrir mixer de música">
+        <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2M5.5 21a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm12-2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/></svg></span>
+    </button>
+    <audio id="backgroundMusic" preload="metadata"></audio>
+</aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js?v=20261014-gallery-refresh"></script>
+<script type="module">
+    try {
+        const maplibregl = await import("https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.mjs");
+        window.maplibregl = maplibregl;
+        window.dispatchEvent(new Event("maplibre-ready"));
+    } catch (error) {
+        console.error("Não foi possível carregar o mapa interativo.", error);
+        const loading = document.getElementById("mapLoading");
+        if (loading) loading.textContent = "Não foi possível carregar o globo. Confira sua conexão e atualize a página.";
+    }
+</script>
+
+</body>
+</html>

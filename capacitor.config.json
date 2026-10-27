@@ -1,0 +1,8 @@
+{
+  "appId": "com.ourlovestory.couple",
+  "appName": "Our Love Story",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

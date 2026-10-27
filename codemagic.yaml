@@ -1,0 +1,36 @@
+workflows:
+  ios-personal-install:
+    name: Our Love Story — iPhone pessoal (sem assinatura paga)
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    environment:
+      node: 24.22.1
+      xcode: latest
+    scripts:
+      - name: Instalar dependências e sincronizar o app
+        script: |
+          npm install --global pnpm@11.25.0
+          pnpm install --frozen-lockfile
+          pnpm run cap:sync
+      - name: Compilar app iOS sem assinatura
+        script: |
+          xcodebuild \
+            -project "$CM_BUILD_DIR/ios/App/App.xcodeproj" \
+            -scheme App \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$CM_BUILD_DIR/build/ios" \
+            CODE_SIGN_IDENTITY='' \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Empacotar para instalação pessoal
+        script: |
+          APP_PATH="$CM_BUILD_DIR/build/ios/Build/Products/Debug-iphoneos/App.app"
+          test -d "$APP_PATH"
+          mkdir -p "$CM_BUILD_DIR/artifacts/Payload"
+          ditto "$APP_PATH" "$CM_BUILD_DIR/artifacts/Payload/App.app"
+          cd "$CM_BUILD_DIR/artifacts"
+          zip -qr OurLoveStory-unsigned.ipa Payload
+    artifacts:
+      - artifacts/OurLoveStory-unsigned.ipa
