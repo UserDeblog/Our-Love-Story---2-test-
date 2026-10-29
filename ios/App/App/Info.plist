@@ -8,6 +8,14 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
         <string>Our Love Story</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Share your location with your partner when you turn sharing on.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Keep sharing your location with your partner while the app is in the background, only when you turn sharing on.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

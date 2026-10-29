@@ -4,39 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <title>Our Love Chronicle</title>
+    <title>Samuel &amp; Gabi — Our Story</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.css">
 
-    <link rel="stylesheet" href="style.css?v=20261014-gallery-refresh">
+    <link rel="stylesheet" href="style.css?v=20261027-countdowns-settings">
 </head>
 
-<body class="intro-active">
-
-<section id="loveIntro" class="love-intro" role="dialog" aria-modal="true" aria-labelledby="introTitle">
-    <div class="intro-glow intro-glow-one"></div>
-    <div class="intro-glow intro-glow-two"></div>
-    <svg class="intro-heart intro-heart-one" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="introHeartRose" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1f4"/><stop offset="1" stop-color="#e98ba2"/></linearGradient></defs><path d="M50 87 14 52C-7 27 22 1 46 22l4 5 5-5C79 1 107 28 86 52L50 87Z" fill="url(#introHeartRose)"/></svg>
-    <svg class="intro-heart intro-heart-two" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 87 14 52C-7 27 22 1 46 22l4 5 5-5C79 1 107 28 86 52L50 87Z" fill="#fff7f8" stroke="#e7a6b5" stroke-width="3"/></svg>
-    <svg class="intro-heart intro-heart-three" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 87 14 52C-7 27 22 1 46 22l4 5 5-5C79 1 107 28 86 52L50 87Z" fill="#efb3c0"/></svg>
-
-    <div class="intro-card">
-        <div class="intro-seal" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M50 84 18 54C-2 34 22 8 44 28l6 6 6-6c22-20 46 6 26 26L50 84Z"/></svg></div>
-        <span class="intro-kicker">A SPECIAL EDITION</span>
-        <div class="intro-rule"><span>✦</span></div>
-        <p class="intro-note">THE STORY OF US</p>
-        <h1 id="introTitle">The story of our lives </h1>
-        <p class="intro-message">Here is everything I've saved from our journey together.</p>
-        <button id="enterLoveSite" class="intro-enter-button" type="button">
-            <span>Enter our story</span>
-            <span class="intro-enter-arrow" aria-hidden="true">→</span>
-        </button>
-        <span class="intro-footer">MADE WITH LOVE, FOR SAMUCA, FOR ETERNITY</span>
-    </div>
-</section>
+<body class="app-opening">
 
 <!-- ================= HEADER ================= -->
 
@@ -49,46 +26,114 @@
     <div class="header-main">
 
         <div class="logo">
-            <span class="logo-small">THE</span>
-            <h1>Our Love Chronicle</h1>
+            <span class="logo-small">OUR STORY</span>
+            <h1>Samuel &amp; Gabi</h1>
             <span class="logo-subtitle">
-                The story of our lives.
+                Our favorite little moments.
             </span>
         </div>
 
-        <div class="love-counter">
-            <span>TOGETHER FOR</span>
-            <strong id="loveCounter">5 MONTHS · 29 DAYS</strong>
-            <small id="loveCounterTime">00 HOURS · 00 MINUTES · 00 SECONDS</small>
+        <div class="header-actions">
+            <button id="optionsButton" class="options-button" type="button" aria-label="Mais opções" aria-haspopup="menu" aria-expanded="false">⋮</button>
+            <div id="optionsMenu" class="options-menu" role="menu" hidden>
+                <button id="settingsMenuItem" type="button" role="menuitem">Settings</button>
+                <button id="adminMenuItem" type="button" role="menuitem">Admin login</button>
+            </div>
+            <aside id="musicMixer" class="music-mixer is-collapsed" aria-label="Background music player">
+                <div id="musicMixerPanel" class="music-mixer-panel" aria-hidden="true">
+                    <div class="music-mixer-heading">
+                        <span class="music-mixer-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 10v4m4-8v12m4-16v20m4-15v10m4-7v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+                        <div><strong>OUR LOVE RADIO</strong><small id="musicStatus" aria-live="polite">Background music</small></div>
+                    </div>
+                    <label class="sr-only" for="musicPlaylistSelect">Choose a playlist</label>
+                    <select id="musicPlaylistSelect" aria-label="Choose a playlist"></select>
+                    <label class="sr-only" for="musicTrackSelect">Choose a song</label>
+                    <select id="musicTrackSelect" aria-label="Choose a song"></select>
+                    <nav id="musicPagination" class="music-pagination" aria-label="Music pages"></nav>
+                    <div class="music-controls">
+                        <button id="musicPrevious" type="button" aria-label="Previous song" title="Previous song"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M19 6 9 12l10 6V6Z"/></svg></button>
+                        <button id="musicPlayPause" class="music-play-button" type="button" aria-label="Play music" title="Play music"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 10 6-10 6V6Z"/></svg></button>
+                        <button id="musicNext" type="button" aria-label="Next song" title="Next song"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M5 6l10 6-10 6V6Z"/></svg></button>
+                        <label class="volume-control" for="musicVolume" title="Volume"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Zm12-2a6 6 0 0 1 0 8m2-11a10 10 0 0 1 0 14"/></svg><input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.35" aria-label="Music volume"></label>
+                    </div>
+                </div>
+                <button id="musicMixerToggle" class="music-mixer-toggle" type="button" aria-label="Open music player" aria-expanded="false" aria-controls="musicMixerPanel" title="Open music player">
+                    <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2M5.5 21a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm12-2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/></svg></span>
+                </button>
+                <audio id="backgroundMusic" preload="metadata"></audio>
+            </aside>
         </div>
 
     </div>
 
     <nav class="navigation">
 
-        <button class="nav-btn active" data-page="home">
-            PRINCIPAL
+        <button class="nav-btn active" data-page="home" aria-label="Home">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Home</span>
         </button>
 
-        <button class="nav-btn" data-page="photos">
-            OUR PHOTOS
+        <button class="nav-btn" data-page="photos" aria-label="Momentos">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>Moments</span>
         </button>
 
-        <button class="nav-btn" data-page="timeline">
-            TIMELINE
+        <button class="nav-btn" data-page="timeline" aria-label="Amor">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg><span>Love</span>
         </button>
 
-        <button class="nav-btn" data-page="news">
-            DAILY NEWS
+        <button class="nav-btn" data-page="dates" aria-label="Datas">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>Dates</span>
         </button>
 
-        <button class="nav-btn" data-page="our-plans">
-            OUR PLANS
+        <button class="nav-btn" data-page="world" aria-label="Localização ao vivo">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span>World</span>
+        </button>
+
+        <button class="nav-btn" data-page="our-plans" aria-label="Nós">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2M19 8a4 4 0 0 1 0 8m3 5v-2a7 7 0 0 0-4-6.3"/></svg><span>Us</span>
         </button>
 
     </nav>
 
 </header>
+
+<dialog id="settingsDialog" class="settings-dialog" aria-labelledby="settingsTitle">
+    <div class="settings-dialog-heading">
+        <div><span class="section-label">OUR STORY</span><h2 id="settingsTitle">Settings</h2></div>
+        <button id="settingsCloseButton" class="settings-close-button" type="button" aria-label="Fechar configurações">×</button>
+    </div>
+    <section class="settings-section">
+        <span class="settings-eyebrow">APPEARANCE</span>
+        <h3>Display mode</h3>
+        <p>Pick the look you like.</p>
+        <button id="themeToggle" class="theme-toggle settings-theme-toggle" type="button" aria-pressed="false" aria-label="Toggle dark mode"><span aria-hidden="true">☾</span><b>Switch light / dark</b></button>
+        <p id="themeStatus" class="settings-status" aria-live="polite"></p>
+    </section>
+    <section class="settings-section admin-settings-section">
+        <span class="settings-eyebrow">ACESSO</span>
+        <h3>Conta do app</h3>
+        <p id="galleryAdminMessage">Entre com sua conta para acessar os recursos vinculados a vocês.</p>
+        <div id="galleryAdminLogin">
+            <input type="email" id="galleryAdminEmail" autocomplete="username" placeholder="Seu e-mail">
+            <input type="password" id="galleryAdminPassword" autocomplete="current-password" placeholder="Senha">
+            <button type="button" onclick="loginGalleryAdmin()">Entrar</button>
+        </div>
+        <button id="galleryAdminLogout" type="button" onclick="logoutGalleryAdmin()" hidden>Sair da conta</button>
+        <p id="galleryAdminStatus" class="upload-status" role="status" aria-live="polite"></p>
+    </section>
+    <section class="settings-section location-settings-section">
+        <span class="settings-eyebrow">LOCALIZAÇÃO AO VIVO</span>
+        <h3>Compartilhamento do casal</h3>
+        <p id="locationPrivacyCopy">Você escolhe quando compartilhar. A outra conta vinculada pode ver sua posição enquanto estiver ativo; o OpenStreetMap recebe as coordenadas para montar o mapa.</p>
+        <div id="locationPairStatus" class="location-status" role="status" aria-live="polite">Entre com uma conta do casal para verificar o vínculo.</div>
+        <div id="locationPartnerCard" class="location-partner-card" hidden>
+            <span class="location-status-dot" aria-hidden="true"></span>
+            <div><b id="locationPartnerName">Localização da outra pessoa</b><small id="locationPartnerUpdated"></small></div>
+            <a id="locationPartnerMapLink" href="#world" hidden>Open on map</a>
+        </div>
+        <button id="locationShareToggle" class="location-share-toggle" type="button" disabled>Ativar compartilhamento</button>
+        <p id="locationShareStatus" class="settings-status" aria-live="polite"></p>
+    </section>
+</dialog>
 
 
 <!-- ================= MAIN ================= -->
@@ -101,11 +146,11 @@
 <section id="home" class="page active-page">
 
     <div class="breaking-news">
-        <span class="breaking-label">LOVE NEWS:</span>
+            <span class="breaking-label">A NOTE FROM US:</span>
 
         <div class="breaking-text">
             <span id="breakingNews">
-                URGENTE: Jesus aprovou passarem a Eternidades juntos.
+                    Hey, welcome. Make yourself at home.
             </span>
         </div>
     </div>
@@ -116,26 +161,23 @@
         <article class="main-story">
 
             <div class="image-container">
-                <img id="memoryImage" src="images/foto30.jpeg" alt="Nosso momento">
+                <img id="memoryImage" src="images/foto9.jpeg" alt="Samuel e Gabi juntos">
                 <video id="memoryVideo" muted playsinline loop hidden></video>
-                <button class="memory-arrow memory-previous" type="button" aria-label="Foto anterior" onclick="showMemory(memoryIndex - 1)">‹</button>
-                <button class="memory-arrow memory-next" type="button" aria-label="Próxima foto" onclick="showMemory(memoryIndex + 1)">›</button>
                 <div id="memoryDots" class="memory-dots" aria-label="Selecionar lembrança"></div>
             </div>
 
             <div class="story-content">
 
-                <span id="memoryDate" class="date">LEMBRANÇA 1 DE 6</span>
+                    <span id="memoryDate" class="date">A LITTLE MOMENT, JUST US</span>
 
-                <h2 id="memoryTitle">UM DOS DIAS QUE NOS PASSAMOS MAIS TEMPO JUNTOS</h2>
+                <h2 id="memoryTitle">Us, being us</h2>
 
                 <p id="memoryComment">
-                    Dizem que alguns minutos mudam tudo, e mudam mesmo.
-                    A nossa realidade se transforma em momentos quando passamos tempo de qualidade juntos.
+                    No big occasion. Just one of those moments I want to remember.
                 </p>
 
                 <button class="read-more" onclick="openPage('timeline')">
-                    Ver a nossa linha do tempo  →
+                    Our story so far →
                 </button>
 
             </div>
@@ -155,13 +197,11 @@
                     </span>
 
                     <h3>
-                        Vimos o por do sol juntos.
+                        That sunset at the lookout.
                     </h3>
 
                     <p>
-                        Foi o dia mais incrível das nossas vidas. vimos o por do sol juntos, me fala se isso vai acontecer dnv?
-                        Porque até os dias comuns viram especiais
-                        quando estou junto com ela.
+                        That sunset at the lookout is still one of my favorite days with you.
                     </p>
                 </div>
 
@@ -182,7 +222,7 @@
                     </h3>
 
                     <p>
-                        Passamos a noite juntos, e fingimos que eramos niggas das trincheiras das favelas durante a volta.
+                        Still laughing about the stories we made up on the way back.
                     </p>
 
                 </div>
@@ -196,135 +236,100 @@
 
     <!-- MOMENTOS -->
 
-    <section class="section">
+    <details class="compact-section" open>
+      <summary><span>Little moments</span><small>Open our recent memories</small></summary>
+      <section class="section">
 
         <div class="section-heading">
 
             <div>
                 <span class="section-label">
-                    OUR ARCHIVE
+                    RECENTLY
                 </span>
 
-                <h2>
-                    Latest Moments
-                </h2>
+                <h2>Recent memories</h2>
             </div>
 
             <button onclick="openPage('photos')">
-                VER TUDO →
+                See all →
             </button>
 
         </div>
 
 
-        <div class="moment-grid">
-
-            <article class="moment-card">
-
-                <img src="images/foto5.jpg" alt="Momento">
-
-                <div class="moment-info">
-                    <span>MEMORY • 2026</span>
-
-                    <h3>
-                       Um dos dias mais legais juntos na igreja
-                    </h3>
-
-                    <p>
-                        A gente passou o dia juntos,
-                    </p>
-                </div>
-
-            </article>
-
-
-            <article class="moment-card">
-
-                <img src="images/foto2.jpg" alt="Momento">
-
-                <div class="moment-info">
-                    <span>LOVE • 2026</span>
-
-                    <h3>
-                        Outra foto do por do sol, sem duvidas um dos dias mais incriveis juntos.
-                    </h3>
-
-                    <p>
-                        Amo passar meu tempo com ela, cada segundo pra mim vale tudo.
-                    </p>
-                </div>
-
-            </article>
-
-
-            <article class="moment-card">
-
-                <img src="images/foto3.jpg" alt="Momento">
-
-                <div class="moment-info">
-                    <span>US • 2026</span>
-
-                    <h3>
-                        Primeira vez depois da colportagem
-                    </h3>
-
-                    <p>
-                        Eu tinha voltado da colportagem e esse foi o primeiro momento nosso que se vimos.
-                    </p>
-                </div>
-
-            </article>
-
+        <div class="moment-grid" id="littleMomentsGrid" aria-live="off"></div>
+        <div id="littleMomentEntries" hidden>
+            <div data-image="images/foto1.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 1" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto2.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 2" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto3.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 3" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto4.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 4" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto5.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 5" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto6.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 6" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto7.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 7" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto8.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 8" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto9.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 9" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto10.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 10" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto11.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 11" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto12.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 12" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto13.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 13" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto14.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 14" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto15.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 15" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto16.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 16" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto17.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 17" data-comment="A little memory from our story."></div>
+            <div data-image="images/foto18.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 18" data-comment="A little memory from our story."></div>
         </div>
+        <template id="littleMomentCardTemplate">
+            <article class="moment-card">
+                <img alt="A little moment together" loading="lazy">
+                <div class="moment-info"><span></span><h3></h3><p></p></div>
+            </article>
+        </template>
 
+      </section>
+    </details>
+
+    <section class="relationship-card" aria-label="Contagem do nosso amor">
+        <div class="relationship-photo"><img src="images/foto9.jpeg" alt="Samuel e Gabi juntos"></div>
+        <div class="relationship-copy"><span>TIME TOGETHER</span><strong id="loveCounter">5 MESES · 29 DIAS</strong><small id="loveCounterTime">00 H · 00 MIN · 00 SEG</small><small class="relationship-since">Since April 3, 2026</small></div>
+        <span class="relationship-heart" aria-hidden="true">♡</span>
     </section>
 
 
     <!-- FRASE -->
 
-    <section class="quote-section">
+    <details class="compact-section home-note-section">
+      <summary><span>A little note</span><small>Open when you need a smile</small></summary>
+      <section class="quote-section">
 
         <div class="quote-mark">“</div>
 
-        <blockquote>
-            O mundo tem bilhões de histórias,
-            mas eu escolheria viver a nossa
-            em todas elas.
+        <blockquote id="littleNoteText">
+            Out of every story, I’d still choose ours.
         </blockquote>
 
-        <span>
-            — OUR LOVE CHRONICLE
+        <span id="littleNoteSignature">
+            — S &amp; G
         </span>
 
-    </section>
-
-
-    <!-- NEWS PREVIEW -->
-
-    <section class="section">
-
-        <div class="section-heading">
-
-            <div>
-                <span class="section-label">
-                    DAILY JOURNAL
-                </span>
-
-                <h2>
-                    Today's News
-                </h2>
-            </div>
-
-            <button onclick="openPage('news')">
-                ALL NEWS →
-            </button>
-
+        <div class="little-note-actions">
+            <button id="editLittleNoteButton" type="button" hidden>Edit note</button>
+            <button id="littleNoteLoginButton" type="button">Sign in to edit</button>
+            <span id="littleNoteStatus" role="status" aria-live="polite"></span>
         </div>
+        <form id="littleNoteForm" class="little-note-form" hidden>
+            <label for="littleNoteInput">Your note for the two of you</label>
+            <textarea id="littleNoteInput" maxlength="1000" rows="4" required placeholder="Write whatever you want here…"></textarea>
+            <div class="little-note-form-actions">
+                <button id="cancelLittleNoteButton" type="button">Cancel</button>
+                <button type="submit">Save note</button>
+            </div>
+        </form>
+
+      </section>
+    </details>
 
 
-        <div id="homeNews" class="news-list"></div>
 
-    </section>
 
 </section>
 
@@ -332,43 +337,69 @@
 
 <!-- ================= PHOTOS ================= -->
 
+<section id="world" class="page location-page">
+    <div class="page-header location-page-header">
+        <span>JUST THE TWO OF US</span>
+        <h2>Our little world</h2>
+        <p>See each other on the map whenever location sharing is on.</p>
+    </div>
+    <div class="location-map-card">
+        <div class="location-map-heading">
+            <div><span class="settings-eyebrow">LIVE LOCATION</span><h3 id="worldLocationTitle">Waiting for your shared location</h3></div>
+            <span id="worldLocationIndicator" class="location-live-indicator">OFF</span>
+        </div>
+        <div id="locationMapEmpty" class="location-map-empty" role="status" aria-live="polite">
+            <span aria-hidden="true">♡</span>
+            <b id="locationMapMessage">Sign in and turn on location sharing to see the map.</b>
+        </div>
+        <iframe id="locationMapFrame" class="location-map-frame" title="Map showing the shared location" loading="lazy" referrerpolicy="no-referrer" hidden></iframe>
+        <div class="location-map-footer">
+            <span id="worldLocationUpdated" aria-live="polite">Location sharing is off.</span>
+            <button id="worldLocationShareToggle" class="location-share-toggle" type="button" disabled>Share my location</button>
+        </div>
+    </div>
+    <p class="location-map-note">Each of you controls sharing and can stop anytime in Settings. OpenStreetMap receives the map coordinates to display the map.</p>
+</section>
+
 <section id="photos" class="page">
 
     <div class="page-header">
 
-        <span>OUR COLLECTION</span>
+        <span>THE PHOTO ALBUM</span>
 
         <h2>
-            Our photos
+            Our memories
         </h2>
 
         <p>
-            Cada foto guarda uma memoria juntos.
+            The ones we keep coming back to.
         </p>
 
     </div>
 
 
+    <details class="compact-section photo-wall-fold" open>
+      <summary><span>Photo wall</span><small>Browse our pictures and videos</small></summary>
     <div class="photo-filters">
 
         <button class="photo-filter active" type="button" data-filter="all">
-            All
+            Todas
         </button>
 
         <button class="photo-filter" type="button" data-filter="us">
-            Us
+            Nós
         </button>
 
         <button class="photo-filter" type="button" data-filter="dates">
-            Dates 
+            Encontros
         </button>
 
         <button class="photo-filter" type="button" data-filter="special-days">
-            Special days
+            Datas especiais
         </button>
 
         <button class="photo-filter" type="button" data-filter="videos">
-            Videos
+            Vídeos
         </button>
 
         <label class="gallery-sort-control" for="gallerySortOrder">Ordenar
@@ -385,18 +416,38 @@
 
     </div>
     <nav id="galleryPagination" class="gallery-pagination" aria-label="Paginação da galeria"></nav>
+    </details>
 
-    <div class="gallery-admin-tools">
-        <h3>Organizar galeria</h3>
-        <p id="galleryAdminMessage">Entra como ADM para mudar as fotos.</p>
-        <div id="galleryAdminLogin">
-            <input type="email" id="galleryAdminEmail" autocomplete="username" placeholder="E-mail do administrador">
-            <input type="password" id="galleryAdminPassword" autocomplete="current-password" placeholder="Senha">
-            <button type="button" onclick="loginGalleryAdmin()">Entrar como ADM</button>
+    <details class="compact-section upload-fold">
+    <summary><span>Add a memory</span><small>Save another photo or video</small></summary>
+    <section class="news-upload-panel memory-upload-panel">
+        <div class="plan-panel-heading"><span class="section-label">OUR PHOTOS</span><h3>Save another memory</h3><p>Add a photo or video for us to look back on.</p></div>
+        <div class="news-upload-form">
+            <span class="upload-label">Escolha uma foto ou vídeo</span>
+            <div class="memory-file-picker-row">
+                <label class="place-photo-picker memory-file-picker" for="memoryFile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Escolher arquivo</span></label>
+                <input class="memory-file-input" type="file" id="memoryFile" accept="image/*,video/*" aria-label="Escolher uma foto ou vídeo">
+                <span id="memoryFileName" class="place-photo-name">Nenhum arquivo escolhido</span>
+            </div>
+            <input type="text" id="memoryUploadTitle" maxlength="100" placeholder="Título do momento (opcional)">
+            <textarea id="memoryUploadSubtitle" maxlength="300" placeholder="Uma legenda para essa lembrança (opcional)"></textarea>
+            <input type="hidden" id="memoryUploadCategory" value="us">
+            <div class="r2-admin-login" id="r2AdminLogin">
+                <label for="r2AdminPassword">Senha de administração da galeria</label>
+                <div class="r2-admin-controls">
+                    <input id="r2AdminPassword" type="password" autocomplete="current-password" placeholder="Senha da galeria" aria-label="Senha de administração da galeria">
+                    <button id="r2AdminLoginButton" type="button">ENTRAR</button>
+                    <button id="r2AdminLogoutButton" type="button" hidden>SAIR</button>
+                </div>
+                <span id="r2AdminStatus" role="status" aria-live="polite">Entre para enviar ou apagar lembranças na nuvem.</span>
+            </div>
+            <button id="uploadMemoryButton" class="memory-upload-button" type="button" onclick="addMemoryUpload()">Adicionar à galeria</button>
+            <p id="uploadStatus" class="upload-status" role="status" aria-live="polite"></p>
         </div>
-        <button id="galleryAdminLogout" type="button" onclick="logoutGalleryAdmin()" hidden>Sair da conta</button>
-        <p id="galleryAdminStatus" class="upload-status" role="status" aria-live="polite"></p>
-    </div>
+    </section>
+    </details>
+
+
 
 </section>
 
@@ -408,36 +459,38 @@
 
     <div class="page-header">
 
-        <span>OUR HISTORY</span>
+        <span>OUR STORY</span>
 
         <h2>
-            The Timeline
+            The timeline
         </h2>
 
         <p>
-            Every chapter brought us here.
+            The little moments that got us here.
         </p>
 
     </div>
 
 
+    <details class="compact-section love-fold" open>
+      <summary><span>Our timeline</span><small>Go back through the chapters</small></summary>
     <div class="timeline-shell">
         <div class="timeline-controls" aria-label="Controles da timeline">
-            <span>UMA HISTÓRIA EM CAPÍTULOS</span>
+            <span>CHAPTERS</span>
             <div>
-                <button id="addTimelineChapter" class="timeline-add-button" type="button">+ Novo capítulo</button>
+                <button id="addTimelineChapter" class="timeline-add-button" type="button">+ New chapter</button>
                 <button type="button" data-timeline-scroll="-1" aria-label="Ver capítulos anteriores">←</button>
                 <button type="button" data-timeline-scroll="1" aria-label="Ver próximos capítulos">→</button>
             </div>
         </div>
         <form id="timelineChapterForm" class="timeline-editor" hidden>
-            <div class="timeline-editor-heading"><div><span class="section-label">NOVO CAPÍTULO</span><h3>Guardar mais uma lembrança</h3></div><button id="cancelTimelineEdit" type="button" aria-label="Fechar formulário">×</button></div>
+            <div class="timeline-editor-heading"><div><span class="section-label">NEW CHAPTER</span><h3>Add a memory</h3></div><button id="cancelTimelineEdit" type="button" aria-label="Close form">×</button></div>
             <div class="timeline-editor-fields">
-                <label>Nome do capítulo<input id="timelineTitleInput" maxlength="80" required placeholder="Ex.: Nosso primeiro show"></label>
-                <label>Data<input id="timelineDateInput" type="date" required></label>
-                <label class="timeline-comment-field">Comentário<textarea id="timelineCommentInput" maxlength="500" required placeholder="Conte por que esse momento é especial"></textarea></label>
+                <label>Title<input id="timelineTitleInput" maxlength="80" required placeholder="e.g. Our first show"></label>
+                <label>Date<input id="timelineDateInput" type="date" required></label>
+                <label class="timeline-comment-field">A note about it<textarea id="timelineCommentInput" maxlength="500" required placeholder="What do you remember most?"></textarea></label>
             </div>
-            <div class="timeline-photo-row"><button id="chooseTimelinePhoto" type="button" class="place-photo-picker">♡ Escolher foto da galeria</button><span id="timelinePhotoName" class="place-photo-name">Nenhuma foto selecionada</span><img id="timelinePhotoPreview" alt="Prévia da foto escolhida" hidden></div>
+            <div class="timeline-photo-row"><button id="chooseTimelinePhoto" type="button" class="place-photo-picker">♡ Choose a photo</button><span id="timelinePhotoName" class="place-photo-name">No photo selected</span><img id="timelinePhotoPreview" alt="Selected photo preview" hidden></div>
             <input id="timelinePhotoUrl" type="hidden">
             <div class="timeline-editor-actions"><p id="timelineEditorStatus" role="status" aria-live="polite"></p><div class="timeline-editor-action-buttons"><button id="deleteTimelineChapter" class="timeline-delete-button" type="button" hidden>Apagar capítulo</button><button type="submit">Salvar capítulo</button></div></div>
         </form>
@@ -470,10 +523,6 @@
                     <p>
                         Primeira vez que saimos juntos, para longe, e foi o começo de tudo.
                     </p>
-                    <button class="timeline-location" type="button" onclick="openPage('our-plans')" aria-label="Abrir nosso mapa para marcar o local desta lembrança">
-                        <span class="timeline-globe" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><path d="M4 24h40M24 3c7 6 10 13 10 21S31 39 24 45M24 3c-7 6-10 13-10 21s3 15 10 21M8 12h32M8 36h32"/></svg><i>♥</i></span>
-                        <span><strong>LOCAL DA LEMBRANÇA</strong><small>Marcar no nosso mapa <b>↗</b></small></span>
-                    </button>
 
                 </div>
 
@@ -509,10 +558,6 @@
                         Cada conversa, cada encontro e cada pequeno
                         momento começou a construir nossa história.
                     </p>
-                    <button class="timeline-location" type="button" onclick="openPage('our-plans')" aria-label="Abrir nosso mapa para marcar o local desta lembrança">
-                        <span class="timeline-globe" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><path d="M4 24h40M24 3c7 6 10 13 10 21S31 39 24 45M24 3c-7 6-10 13-10 21s3 15 10 21M8 12h32M8 36h32"/></svg><i>♥</i></span>
-                        <span><strong>LOCAL DA LEMBRANÇA</strong><small>Marcar no nosso mapa <b>↗</b></small></span>
-                    </button>
 
                 </div>
 
@@ -548,10 +593,6 @@
                         O que começou como uma história se tornou
                         parte da nossa vida.
                     </p>
-                    <button class="timeline-location" type="button" onclick="openPage('our-plans')" aria-label="Abrir nosso mapa para marcar o local desta lembrança">
-                        <span class="timeline-globe" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><path d="M4 24h40M24 3c7 6 10 13 10 21S31 39 24 45M24 3c-7 6-10 13-10 21s3 15 10 21M8 12h32M8 36h32"/></svg><i>♥</i></span>
-                        <span><strong>LOCAL DA LEMBRANÇA</strong><small>Marcar no nosso mapa <b>↗</b></small></span>
-                    </button>
 
                 </div>
 
@@ -600,96 +641,57 @@
 
         </div>
     </div>
+    </details>
 
-    <section class="date-roulette" aria-labelledby="dateRouletteTitle">
-        <div class="date-roulette-copy"><span class="section-label">Sorteio de coisas para fazer</span><h3 id="dateRouletteTitle">Roleta de dates</h3><p>A sorte vai escolher por nós.</p><div id="dateRouletteResult" class="date-roulette-result" aria-live="polite">Gire a roleta para descobrir</div><button id="spinDateRoulette" type="button">Girar a roleta <span>↗</span></button>
-            <div class="date-idea-manager"><h4>Nossas ideias</h4><form id="dateIdeaForm"><input id="dateIdeaInput" maxlength="90" placeholder="Adicionar uma ideia de encontro" required><button id="saveDateIdea" type="submit">Adicionar</button><button id="cancelDateIdeaEdit" type="button" hidden>Cancelar</button></form><p id="dateIdeaStatus" aria-live="polite"></p><ul id="dateIdeaList" aria-label="Ideias salvas para a roleta"></ul></div>
+    <details class="compact-section love-fold">
+      <summary><span>Before we started dating</span><small>Our shared list of things to do together</small></summary>
+      <section class="plan-panel checklist-panel love-checklist-panel">
+        <div class="plan-panel-heading"><span class="section-label">OUR LIST</span><h3>Things we wanted to do</h3><p>Some from before we started dating, and some for what comes next.</p></div>
+        <form id="checklistForm" class="plan-form checklist-form">
+            <input id="checklistText" type="text" maxlength="180" placeholder="Add something to our list…" required>
+            <button type="submit">ADD TO OUR LIST +</button>
+        </form>
+        <div class="checklist-progress"><span id="checklistProgress">0 of 0 done</span><div class="progress-track"><span id="checklistProgressBar"></span></div></div>
+        <ul id="checklistItems" class="checklist-items" aria-live="polite"></ul>
+      </section>
+    </details>
+
+    <details class="compact-section love-fold">
+      <summary><span>Date roulette</span><small>Let the wheel pick what we do together</small></summary>
+      <section class="date-roulette" aria-labelledby="dateRouletteTitle">
+        <div class="date-roulette-copy"><span class="section-label">DATE NIGHT IDEAS</span><h3 id="dateRouletteTitle">What should we do?</h3><p>Can’t decide? Let’s leave it to the wheel.</p><div id="dateRouletteResult" class="date-roulette-result" aria-live="polite">Spin the wheel and see</div><button id="spinDateRoulette" type="button">Spin the wheel <span>↗</span></button>
+            <div class="date-idea-manager"><h4>Our ideas</h4><form id="dateIdeaForm"><input id="dateIdeaInput" maxlength="90" placeholder="Add a date idea" required><button id="saveDateIdea" type="submit">Add</button><button id="cancelDateIdeaEdit" type="button" hidden>Cancel</button></form><p id="dateIdeaStatus" aria-live="polite"></p><ul id="dateIdeaList" aria-label="Ideas for the date roulette"></ul></div>
         </div>
-        <div class="date-wheel-wrap"><div id="dateWheel" class="date-wheel" role="img" aria-label="Roleta com ideias de encontros"><span class="wheel-center">♥</span></div><span class="wheel-pointer" aria-hidden="true">▼</span></div>
-    </section>
+        <div class="date-wheel-wrap"><div id="dateWheel" class="date-wheel" role="img" aria-label="Date idea wheel"><span class="wheel-center">♥</span></div><span class="wheel-pointer" aria-hidden="true">▼</span></div>
+      </section>
+    </details>
 
+</section>
+
+<section id="dates" class="page">
+    <div class="page-header"><span>COMING UP</span><h2>Dates to look forward to</h2><p>All the little big days on our calendar.</p></div>
+    <details class="compact-section dates-fold" open>
+      <summary><span>Our countdowns</span><small>Birthdays, anniversaries and the big days</small></summary>
+      <div id="countdownGrid" class="countdown-grid" aria-live="off"></div>
+    </details>
 </section>
 
 <dialog id="timelinePhotoDialog" class="timeline-photo-dialog" aria-labelledby="timelinePhotoDialogTitle"><div class="timeline-photo-dialog-head"><div><span class="section-label">OUR PHOTOS</span><h2 id="timelinePhotoDialogTitle">Escolha uma lembrança</h2></div><button type="button" id="closeTimelinePhotoDialog" aria-label="Fechar galeria">×</button></div><div id="timelinePhotoChoices" class="timeline-photo-choices"></div></dialog>
 
 
 
-<!-- ================= DAILY NEWS ================= -->
-
-<section id="news" class="page">
-
-    <div class="page-header">
-
-        <span>THE DAILY EDITION</span>
-
-        <h2>
-            Daily News
-        </h2>
-
-        <p>
-            Everything that happened in our little world.
-        </p>
-
-    </div>
-
-
-    <div class="news-upload-layout">
-        <section class="news-upload-panel">
-            <div class="plan-panel-heading">
-                <span class="section-label">NOSSAS HISTÓRIAS</span>
-                <h3>📝 Add Today's News</h3>
-                <p>Notícias ficam salvas para todos. Entre como administrador em “Nossas Fotos” para editar ou apagar.</p>
-            </div>
-            <div class="news-upload-form">
-                <input type="text" id="newsTitle" placeholder="Título da notícia">
-                <textarea id="newsDescription" placeholder="O que aconteceu hoje?"></textarea>
-                <button id="saveNewsButton" type="button" onclick="addNews()">PUBLISH NEWS</button>
-                <button id="cancelNewsEdit" type="button" onclick="cancelNewsEdit()" hidden>CANCEL EDIT</button>
-                <p id="newsStatus" class="upload-status" role="status" aria-live="polite"></p>
-            </div>
-        </section>
-
-        <section class="news-upload-panel">
-            <div class="plan-panel-heading">
-                <span class="section-label">NOSSAS LEMBRANÇAS</span>
-                <h3>Guardar uma foto ou vídeo</h3>
-                <p>Novas lembranças aparecerão na galeria para todos que acessarem o site.</p>
-            </div>
-            <div class="news-upload-form">
-                <span class="upload-label">Escolha uma foto ou vídeo</span>
-                <div class="memory-file-picker-row">
-                    <label class="place-photo-picker memory-file-picker" for="memoryFile">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"/><circle cx="12" cy="13" r="3.5"/></svg>
-                        <span>Escolher arquivo</span>
-                    </label>
-                    <input class="memory-file-input" type="file" id="memoryFile" accept="image/*,video/*" aria-label="Escolher uma foto ou vídeo">
-                    <span id="memoryFileName" class="place-photo-name">Nenhum arquivo escolhido</span>
-                </div>
-                <input type="text" id="memoryUploadTitle" maxlength="100" placeholder="Título para o carrossel (opcional)">
-                <textarea id="memoryUploadSubtitle" maxlength="300" placeholder="Legenda do carrossel (opcional; sem legenda, a foto aparece só na galeria)"></textarea>
-                <input type="hidden" id="memoryUploadCategory" value="us">
-                <button id="uploadMemoryButton" class="memory-upload-button" type="button" onclick="addMemoryUpload()">Adicionar à galeria</button>
-                <p id="uploadStatus" class="upload-status" role="status" aria-live="polite"></p>
-            </div>
-        </section>
-    </div>
-
-
-    <div id="allNews" class="news-list large"></div>
-    <nav id="newsPagination" class="gallery-pagination" aria-label="Paginação das notícias"></nav>
-
-</section>
-
 <!-- ================= NOSSA HISTÓRIA JUNTOS ================= -->
 
 <section id="our-plans" class="page">
     <div class="page-header">
-        <span>OUR NEXT CHAPTERS</span>
-        <h2>Nossos planos</h2>
-        <p>Cartas para o futuro, lugares para conhecer e coisas para viver juntos.</p>
+        <span>FOR THE DAYS AHEAD</span>
+        <h2>Things we’re saving for later</h2>
+        <p>Notes, memories, and plans for whenever we’re ready.</p>
     </div>
 
     <div class="plans-layout">
+      <details class="compact-section plan-fold" open>
+        <summary><span>Letters &amp; time capsule</span><small>Leave a note for now or for future us</small></summary>
         <section class="plan-panel letters-panel">
             <div class="plan-panel-heading">
                 <span class="section-label">PALAVRAS GUARDADAS</span>
@@ -761,72 +763,7 @@
                 <div id="capsulesList" class="letters-list" aria-live="polite"></div>
             </section>
         </section>
-
-        <section class="plan-panel map-panel">
-            <div class="plan-panel-heading">
-                <span class="section-label">NOSSO MAPA</span>
-                <h3>Já fomos &amp; queremos ir</h3>
-                <p>Explore o globo, marque os lugares de vocês e guarde uma foto junto com cada lembrança.</p>
-            </div>
-            <div id="loveMap" class="love-map" role="application" aria-label="Mapa interativo do mundo. Toque para selecionar um lugar.">
-                <div id="loveMapCanvas" class="love-map-canvas"></div>
-                <div id="mapLoading" class="map-loading" role="status">Carregando o globo…</div>
-                <button id="mapGoTaubate" class="map-focus-button" type="button" title="Voltar para Taubaté">⌖ Taubaté</button>
-                <button id="mapFullscreenButton" class="map-fullscreen-button" type="button" aria-pressed="false">⛶ Tela cheia</button>
-            </div>
-            <form id="placeForm" class="plan-form place-form">
-                <input id="placeName" type="text" maxlength="100" placeholder="Nome do lugar (ex.: Paris, França)" required>
-                <div class="address-search">
-                    <label for="placeAddress">Buscar endereço ou cidade para mover o ponto
-                        <input id="placeAddress" type="search" maxlength="150" placeholder="Ex.: Rio de Janeiro, RJ">
-                    </label>
-                    <button id="searchPlaceAddress" type="button">BUSCAR NO MAPA</button>
-                    <div id="addressResultsWrap" hidden>
-                        <label for="addressResults">Escolha o resultado
-                            <select id="addressResults"></select>
-                        </label>
-                    </div>
-                    <p id="addressSearchStatus" role="status" aria-live="polite">Busca pelo OpenStreetMap. Não inclua endereço residencial exato ou dados pessoais. © OpenStreetMap contributors.</p>
-                </div>
-                <div class="plan-form-row">
-                    <label for="placeKind">Esse lugar…
-                        <select id="placeKind"><option value="dream">é um sonho ✨</option><option value="visited">já visitamos ♥</option></select>
-                    </label>
-                    <label for="placeDate">Data (opcional)
-                        <input id="placeDate" type="date">
-                    </label>
-                </div>
-                <div class="place-photo-picker-row">
-                    <span class="place-photo-label">Foto do lugar <small>(opcional)</small></span>
-                    <label class="place-photo-picker" for="placePhoto">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"/><circle cx="12" cy="13" r="3.5"/></svg>
-                        <span>Escolher foto</span>
-                    </label>
-                    <input id="placePhoto" class="place-photo-input" type="file" accept="image/*" aria-label="Escolher foto deste lugar">
-                    <span id="placePhotoName" class="place-photo-name">Nenhuma foto escolhida</span>
-                </div>
-                <span id="placeCoordinates" class="place-coordinate-hint">Toque no globo para escolher onde fica o lugar. Um ponto inicial já está marcado em Taubaté.</span>
-                <button id="savePlaceButton" type="submit">ADICIONAR AO MAPA</button>
-                <button id="cancelPlaceEdit" class="secondary-plan-button" type="button" hidden>Cancelar edição</button>
-                <p id="placeStatus" class="upload-status" role="status" aria-live="polite">Taubaté já está selecionada como ponto inicial.</p>
-            </form>
-            <div class="map-legend"><span>♥ Já fomos</span><span>✦ Queremos ir</span></div>
-            <div id="placesList" class="places-list" aria-live="polite"></div>
-        </section>
-
-        <section class="plan-panel checklist-panel">
-            <div class="plan-panel-heading">
-                <span class="section-label">COISAS PARA VIVER</span>
-                <h3>Antes de namorar</h3>
-                <p>Uma checklist compartilhada para acompanhar essa lista especial.</p>
-            </div>
-            <form id="checklistForm" class="plan-form checklist-form">
-                <input id="checklistText" type="text" maxlength="180" placeholder="Adicionar uma coisa da lista…" required>
-                <button type="submit">ADICIONAR À LISTA +</button>
-            </form>
-            <div class="checklist-progress"><span id="checklistProgress">0 de 0 concluídos</span><div class="progress-track"><span id="checklistProgressBar"></span></div></div>
-            <ul id="checklistItems" class="checklist-items" aria-live="polite"></ul>
-        </section>
+      </details>
     </div>
 </section>
 
@@ -868,13 +805,10 @@
 
 <footer>
 
-    <div class="footer-logo">
-        OUR LOVE CHRONICLE
-    </div>
+    <div class="footer-logo">OUR STORY</div>
 
     <p>
-        A newspaper about two people, gabii and samuel,
-        countless memories and one story.
+        Photos, plans, and little moments we want to keep.
     </p>
 
     <span>
@@ -883,55 +817,11 @@
 
 </footer>
 
-<div class="floating-action-stack">
-    <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Ativar modo escuro" title="Alternar modo claro e escuro"><span aria-hidden="true">☾</span></button>
-<aside id="musicMixer" class="music-mixer is-collapsed" aria-label="Mixer de música de fundo">
-    <div id="musicMixerPanel" class="music-mixer-panel" aria-hidden="true">
-        <div class="music-mixer-heading">
-            <span class="music-mixer-mark" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none"><path d="M4 10v4m4-8v12m4-16v20m4-15v10m4-7v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-            </span>
-            <div>
-                <strong>OUR LOVE RADIO</strong>
-                <small id="musicStatus" aria-live="polite">Música de fundo</small>
-            </div>
-        </div>
-        <label class="sr-only" for="musicPlaylistSelect">Escolher playlist</label>
-        <select id="musicPlaylistSelect" aria-label="Escolher playlist"></select>
-        <label class="sr-only" for="musicTrackSelect">Escolher música</label>
-        <select id="musicTrackSelect" aria-label="Escolher música"></select>
-        <nav id="musicPagination" class="music-pagination" aria-label="Páginas de músicas"></nav>
-        <div class="music-controls">
-            <button id="musicPrevious" type="button" aria-label="Música anterior" title="Música anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M19 6 9 12l10 6V6Z"/></svg></button>
-            <button id="musicPlayPause" class="music-play-button" type="button" aria-label="Tocar música" title="Tocar música"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 10 6-10 6V6Z"/></svg></button>
-            <button id="musicNext" type="button" aria-label="Próxima música" title="Próxima música"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5v14M5 6l10 6-10 6V6Z"/></svg></button>
-            <label class="volume-control" for="musicVolume" title="Volume">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Zm12-2a6 6 0 0 1 0 8m2-11a10 10 0 0 1 0 14"/></svg>
-                <input id="musicVolume" type="range" min="0" max="1" step="0.01" value="0.35" aria-label="Volume da música">
-            </label>
-        </div>
-    </div>
-    <button id="musicMixerToggle" class="music-mixer-toggle" type="button" aria-label="Abrir mixer de música" aria-expanded="false" aria-controls="musicMixerPanel" title="Abrir mixer de música">
-        <span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2M5.5 21a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm12-2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/></svg></span>
-    </button>
-    <audio id="backgroundMusic" preload="metadata"></audio>
-</aside>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="cloudflare-config.js"></script>
 <script src="supabase-config.js"></script>
-<script src="script.js?v=20261014-gallery-refresh"></script>
-<script type="module">
-    try {
-        const maplibregl = await import("https://unpkg.com/maplibre-gl@6.13.0/dist/maplibre-gl.mjs");
-        window.maplibregl = maplibregl;
-        window.dispatchEvent(new Event("maplibre-ready"));
-    } catch (error) {
-        console.error("Não foi possível carregar o mapa interativo.", error);
-        const loading = document.getElementById("mapLoading");
-        if (loading) loading.textContent = "Não foi possível carregar o globo. Confira sua conexão e atualize a página.";
-    }
-</script>
+<script src="script.js?v=20261027-countdowns-settings"></script>
+<script src="location.js"></script>
 
 </body>
 </html>

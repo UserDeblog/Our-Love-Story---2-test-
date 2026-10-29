@@ -58,11 +58,113 @@ function updateLoveCounter() {
     const compactDate = new Intl.DateTimeFormat("pt-BR", {
         weekday: "short", day: "2-digit", month: "short", year: "numeric"
     }).format(now).replace(/\./g, "").toLocaleUpperCase("pt-BR");
-    document.getElementById("currentDate").textContent = `${compactDate} · NOSSO JORNAL`;
+    document.getElementById("currentDate").textContent = compactDate;
 }
 
 updateLoveCounter();
 window.setInterval(updateLoveCounter, 1000);
+
+const countdownEvents = [
+    { key: "gabi-birthday", title: "Gabi’s birthday", icon: "🎂", month: 10, day: 30, dateLabel: "November 30", message: "Happy birthday, Gabi! 💖" },
+    { key: "fifteenth-party", title: "Gabi’s 15th birthday party", icon: "🎉", fixed: new Date(2026, 11, 13), dateLabel: "December 13, 2026", message: "Let’s make it a night to remember! ✨" },
+    { key: "christmas", title: "Christmas", icon: "🎄", month: 11, day: 25, dateLabel: "December 25", message: "Merry Christmas! 🎄" },
+    { key: "new-year", title: "New Year’s Day", icon: "✨", month: 0, day: 1, dateLabel: "January 1", message: "Another year, together. ✨" },
+    { key: "samuel-birthday", title: "Samuel’s birthday", icon: "🎂", month: 3, day: 17, dateLabel: "April 17", message: "Happy birthday, Samuel! 💖" },
+    { key: "relationship-anniversary", title: "Our anniversary", icon: "💞", month: 3, day: 3, dateLabel: "April 3", message: "One more year of us. 💞" },
+    { key: "valentines", title: "Valentine’s Day (Brazil)", icon: "💌", month: 5, day: 12, dateLabel: "June 12", message: "Happy Dia dos Namorados! 💌" }
+];
+
+function getCountdownTarget(event, now = new Date()) {
+    if (event.fixed) return event.fixed;
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(now.getFullYear(), event.month, event.day);
+    if (target < today) target.setFullYear(target.getFullYear() + 1);
+    return target;
+}
+
+function countdownCalendarDays(from, to) {
+    const fromDay = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate());
+    const toDay = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate());
+    return Math.round((toDay - fromDay) / 86400000);
+}
+
+function renderCountdownCards() {
+    const grid = document.getElementById("countdownGrid");
+    if (!grid) return;
+    const together = { key: "together", title: "Together", icon: "💞" };
+    const orderedEvents = countdownEvents.slice().sort((a, b) => {
+        const targetA = getCountdownTarget(a)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+        const targetB = getCountdownTarget(b)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+        return targetA - targetB;
+    });
+    [together, ...orderedEvents].forEach(event => {
+        const card = document.createElement("article");
+        card.className = `countdown-card${event.key === "together" ? " countdown-together" : ""}`;
+        card.dataset.countdownKey = event.key;
+        const icon = document.createElement("span"); icon.className = "countdown-icon"; icon.textContent = event.icon;
+        const copy = document.createElement("div"); copy.className = "countdown-copy";
+        const title = document.createElement("h3"); title.textContent = event.title;
+        const value = document.createElement("strong"); value.className = "countdown-value";
+        const unit = document.createElement("span"); unit.className = "countdown-unit";
+        const detail = document.createElement("small"); detail.className = "countdown-detail";
+        copy.append(title, value, unit, detail);
+        card.append(icon, copy);
+        grid.append(card);
+    });
+    updateCountdownCards();
+}
+
+function updateCountdownCards() {
+    const grid = document.getElementById("countdownGrid");
+    if (!grid) return;
+    const now = new Date();
+    grid.querySelectorAll(".countdown-card").forEach(card => {
+        const key = card.dataset.countdownKey;
+        const value = card.querySelector(".countdown-value");
+        const unit = card.querySelector(".countdown-unit");
+        const detail = card.querySelector(".countdown-detail");
+        if (key === "together") {
+            const totalSeconds = Math.max(0, Math.floor((now - relationshipStart) / 1000));
+            const days = countdownCalendarDays(relationshipStart, now);
+            const hours = Math.floor(totalSeconds / 3600) % 24;
+            const minutes = Math.floor(totalSeconds / 60) % 60;
+            const seconds = totalSeconds % 60;
+            value.textContent = String(days);
+            unit.textContent = days === 1 ? "dia juntos" : "dias juntos";
+            detail.textContent = `Desde 3 de abril de 2026 · ${hours}h ${minutes}min ${seconds}s`;
+            return;
+        }
+        const event = countdownEvents.find(item => item.key === key);
+        if (!event) return;
+        const target = getCountdownTarget(event, now);
+        const days = countdownCalendarDays(now, target);
+        card.classList.toggle("countdown-today", days === 0);
+        card.classList.toggle("countdown-past", Boolean(event.fixed && days < 0));
+        if (event.fixed && days < 0) {
+            value.textContent = "Celebração feita";
+            unit.textContent = "";
+            detail.textContent = event.dateLabel;
+            return;
+        }
+        if (days === 0) {
+            value.textContent = "É hoje!";
+            unit.textContent = "";
+            detail.textContent = event.message;
+            return;
+        }
+        const secondsRemaining = Math.max(0, Math.floor((target - now) / 1000));
+        const hours = Math.floor(secondsRemaining / 3600) % 24;
+        const minutes = Math.floor(secondsRemaining / 60) % 60;
+        const seconds = secondsRemaining % 60;
+        value.textContent = String(days);
+        unit.textContent = days === 1 ? "dia" : "dias";
+        const upcomingDate = event.fixed ? event.dateLabel : `${event.dateLabel} de ${target.getFullYear()}`;
+        detail.textContent = `${upcomingDate} · ${hours}h ${minutes}min ${seconds}s`;
+    });
+}
+
+renderCountdownCards();
+window.setInterval(updateCountdownCards, 1000);
 
 const themeToggle = document.getElementById("themeToggle");
 const savedTheme = (() => { try { return localStorage.getItem("loveChronicleTheme"); } catch (_) { return null; } })();
@@ -71,6 +173,8 @@ function setPageTheme(isDark) {
     themeToggle.setAttribute("aria-pressed", String(isDark));
     themeToggle.setAttribute("aria-label", isDark ? "Ativar modo claro" : "Ativar modo escuro");
     themeToggle.querySelector("span").textContent = isDark ? "☀" : "☾";
+    const themeStatus = document.getElementById("themeStatus");
+    if (themeStatus) themeStatus.textContent = isDark ? "Modo escuro ativado." : "Modo claro ativado.";
     try { localStorage.setItem("loveChronicleTheme", isDark ? "dark" : "light"); } catch (_) {}
 }
 setPageTheme(savedTheme === "dark");
@@ -104,17 +208,36 @@ themeToggle.addEventListener("click", () => {
     }
 });
 
-const loveIntro = document.getElementById("loveIntro");
-const enterLoveSiteButton = document.getElementById("enterLoveSite");
-enterLoveSiteButton.focus({ preventScroll: true });
-enterLoveSiteButton.addEventListener("click", () => {
-    loveIntro.classList.add("is-leaving");
-    loveIntro.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("intro-active");
-    window.setTimeout(() => {
-        loveIntro.hidden = true;
-        document.querySelector(".nav-btn.active")?.focus({ preventScroll: true });
-    }, 700);
+const optionsButton = document.getElementById("optionsButton");
+const optionsMenu = document.getElementById("optionsMenu");
+const settingsDialog = document.getElementById("settingsDialog");
+function closeOptionsMenu() {
+    optionsMenu.hidden = true;
+    optionsButton.setAttribute("aria-expanded", "false");
+}
+function openSettings(focusLogin = false) {
+    closeOptionsMenu();
+    if (!settingsDialog.open) settingsDialog.showModal();
+    if (focusLogin && !galleryAdminUser) window.setTimeout(() => document.getElementById("galleryAdminEmail").focus({ preventScroll: true }), 80);
+}
+optionsButton.addEventListener("click", () => {
+    const opening = optionsMenu.hidden;
+    optionsMenu.hidden = !opening;
+    optionsButton.setAttribute("aria-expanded", String(opening));
+});
+document.getElementById("settingsMenuItem").addEventListener("click", () => openSettings());
+document.getElementById("adminMenuItem").addEventListener("click", () => openSettings(true));
+document.getElementById("settingsCloseButton").addEventListener("click", () => settingsDialog.close());
+settingsDialog.addEventListener("click", event => { if (event.target === settingsDialog) settingsDialog.close(); });
+document.addEventListener("click", event => {
+    if (!optionsMenu.hidden && !event.target.closest(".header-actions")) closeOptionsMenu();
+});
+
+window.setTimeout(() => document.body.classList.remove("app-opening"), 900);
+document.querySelectorAll(".page").forEach(page => {
+    const firstSection = page.querySelector(".compact-section");
+    if (!firstSection) return;
+    firstSection.open = true;
 });
 
 
@@ -129,6 +252,8 @@ const MUSIC_PAGE_SIZE = 8;
 const MUSIC_PLAYLISTS = ["Animadas", "Calmas", "Piano", "Românticas"];
 
 const backgroundMusic = document.getElementById("backgroundMusic");
+document.querySelector(".header-actions")?.append(document.getElementById("musicMixer"));
+document.querySelector(".floating-action-stack")?.remove();
 backgroundMusic.crossOrigin = "anonymous";
 const musicTrackSelect = document.getElementById("musicTrackSelect");
 const musicPlaylistSelect = document.getElementById("musicPlaylistSelect");
@@ -401,39 +526,75 @@ document.addEventListener("pointerdown", event => {
 const memories = [
     {
         image: "images/foto1.jpg",
-        title: "UM DOS DIAS QUE PASSAMOS MAIS TEMPO JUNTOS",
-        comment: "Dizem que alguns minutos mudam tudo, e mudam mesmo. A nossa realidade se transforma em momentos quando passamos tempo de qualidade juntos."
+        title: "One of those days we lost track of time",
+        comment: "We had nowhere else to be. I wish we could do that more often."
     },
     {
         image: "images/foto2.jpg",
-        title: "VIMOS O PÔR DO SOL JUNTOS",
-        comment: "Foi um dia que a gente foi no mirante, no quebrando silencio. Vimos o pôr do sol juntos. Primeira vez que a gente viu um pôr do sol juntos."
+        title: "Our first sunset together",
+        comment: "That evening at the lookout still comes to mind whenever I see a good sunset."
     },
     {
         image: "images/foto3.jpg",
-        title: "MINHA MÃE TIROU A FOTO DA GENTE",
-        comment: "Tentando ficar charmosos, mas a gente não consegue, e minha mãe não ajuda. Mas mesmo assim, a gente se ama e isso é o que importa."
+        title: "Mom took this one",
+        comment: "We were trying to look cool. Mom did not make it easy. Still one of my favorites."
     },
     {
         image: "images/foto4.jpg",
-        title: "DIA NA IGREJA COM A GABI",
-        comment: "Foi um dia que a gente foi na igreja, e a gente se divertiu muito."
+        title: "Church with Gabi",
+        comment: "A simple day together, and a really good one."
     },
     {
         image: "images/foto5.jpg",
-        title: "FUI NA CASA DA GABI",
-        comment: "Algumas memórias não precisam de grandes acontecimentos. Estar junto já faz qualquer momento valer a pena."
+        title: "At Gabi’s place",
+        comment: "No big plans. Just happy to be there with you."
     },
     {
         image: "images/foto6.jpg",
-        title: "NÓS DOIS, FAZENDO GRACINHA",
-        comment: "Estarmos juntos já é motivo suficiente para transformar qualquer dia em uma lembrança especial."
+        title: "Being silly together",
+        comment: "We do not need a reason. We just get each other laughing."
     }
 ];
 const originalMemories = memories.slice();
 const MEMORY_CAROUSEL_LIMIT = 6;
 const GALLERY_PAGE_SIZE = 24;
 const NEWS_PAGE_SIZE = 6;
+
+const littleMomentEntries = Array.from(document.querySelectorAll("#littleMomentEntries [data-image]"), entry => ({
+    image: entry.dataset.image,
+    kicker: entry.dataset.kicker || "A LITTLE MOMENT",
+    title: entry.dataset.title || "Our little moment",
+    comment: entry.dataset.comment || "A little memory from our story."
+}));
+const littleMomentGrid = document.getElementById("littleMomentsGrid");
+const littleMomentCardTemplate = document.getElementById("littleMomentCardTemplate");
+let littleMomentBatch = 0;
+
+function renderLittleMomentBatch() {
+    if (!littleMomentGrid || !littleMomentCardTemplate || !littleMomentEntries.length) return;
+    const batchCount = Math.ceil(littleMomentEntries.length / 3);
+    const firstIndex = (littleMomentBatch % batchCount) * 3;
+    const fragment = document.createDocumentFragment();
+    littleMomentEntries.slice(firstIndex, firstIndex + 3).forEach(moment => {
+        const card = littleMomentCardTemplate.content.firstElementChild.cloneNode(true);
+        const image = card.querySelector("img");
+        image.src = moment.image;
+        image.alt = moment.title;
+        card.querySelector(".moment-info span").textContent = moment.kicker;
+        card.querySelector(".moment-info h3").textContent = moment.title;
+        card.querySelector(".moment-info p").textContent = moment.comment;
+        fragment.appendChild(card);
+    });
+    littleMomentGrid.replaceChildren(fragment);
+}
+
+renderLittleMomentBatch();
+if (littleMomentEntries.length > 3) {
+    window.setInterval(() => {
+        littleMomentBatch = (littleMomentBatch + 1) % Math.ceil(littleMomentEntries.length / 3);
+        renderLittleMomentBatch();
+    }, 10 * 60 * 1000);
+}
 
 function refreshMemoryCarousel(preferredMemoryId = null) {
     const carouselMemories = uploadedMemories
@@ -456,9 +617,108 @@ const supabaseClient = window.supabase?.createClient(
     window.SUPABASE_CONFIG?.url,
     window.SUPABASE_CONFIG?.publishableKey
 );
+window.appSupabaseClient = supabaseClient;
 let uploadedMemories = [];
 let galleryAdminUser = null;
 let galleryAdminIsAllowed = false;
+let r2AdminIsAllowed = false;
+const LITTLE_NOTE_STORAGE_KEY = "loveChronicleLittleNote";
+const LITTLE_NOTE_DEFAULT = "Out of every story, I’d still choose ours.";
+const littleNoteText = document.getElementById("littleNoteText");
+const littleNoteInput = document.getElementById("littleNoteInput");
+const littleNoteForm = document.getElementById("littleNoteForm");
+const littleNoteStatus = document.getElementById("littleNoteStatus");
+let littleNoteValue = (() => {
+    try { return localStorage.getItem(LITTLE_NOTE_STORAGE_KEY) || LITTLE_NOTE_DEFAULT; }
+    catch (_) { return LITTLE_NOTE_DEFAULT; }
+})();
+
+function setLittleNote(note, persistLocally = true) {
+    littleNoteValue = String(note || LITTLE_NOTE_DEFAULT);
+    if (littleNoteText) littleNoteText.textContent = littleNoteValue;
+    if (persistLocally) {
+        try { localStorage.setItem(LITTLE_NOTE_STORAGE_KEY, littleNoteValue); } catch (_) {}
+    }
+}
+
+function updateLittleNoteAccess() {
+    document.getElementById("editLittleNoteButton").hidden = !galleryAdminIsAllowed;
+    document.getElementById("littleNoteLoginButton").hidden = galleryAdminIsAllowed;
+}
+
+async function loadLittleNote() {
+    updateLittleNoteAccess();
+    if (!supabaseClient || !galleryAdminIsAllowed) return;
+    const { data: coupleId, error: coupleError } = await supabaseClient.rpc("current_couple_id");
+    if (coupleError || !coupleId) {
+        littleNoteStatus.textContent = "The couple link is not ready yet.";
+        return;
+    }
+    const { data, error } = await supabaseClient.from("couple_notes")
+        .select("note")
+        .eq("couple_id", coupleId)
+        .maybeSingle();
+    if (error) {
+        littleNoteStatus.textContent = "Run the little note setup SQL to sync this note between phones.";
+        return;
+    }
+    if (data?.note) setLittleNote(data.note);
+    else if (littleNoteValue !== LITTLE_NOTE_DEFAULT && galleryAdminUser) {
+        const { error: migrationError } = await supabaseClient.from("couple_notes").upsert({
+            couple_id: coupleId,
+            note: littleNoteValue,
+            updated_by: galleryAdminUser.id,
+            updated_at: new Date().toISOString()
+        }, { onConflict: "couple_id" });
+        if (migrationError) console.warn("Could not sync the note saved on this device yet.", migrationError);
+    }
+}
+
+window.setInterval(() => {
+    if (document.visibilityState === "visible" && galleryAdminIsAllowed && littleNoteForm.hidden) {
+        void loadLittleNote();
+    }
+}, 60000);
+
+document.getElementById("littleNoteLoginButton").addEventListener("click", () => openSettings(true));
+document.getElementById("editLittleNoteButton").addEventListener("click", () => {
+    littleNoteInput.value = littleNoteValue;
+    littleNoteForm.hidden = false;
+    littleNoteInput.focus({ preventScroll: true });
+});
+document.getElementById("cancelLittleNoteButton").addEventListener("click", () => {
+    littleNoteForm.hidden = true;
+    littleNoteStatus.textContent = "";
+});
+littleNoteForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (!galleryAdminIsAllowed || !supabaseClient) {
+        littleNoteStatus.textContent = "Sign in with one of the linked accounts to save the note.";
+        return;
+    }
+    const note = littleNoteInput.value.trim();
+    if (!note) return;
+    const { data: coupleId, error: coupleError } = await supabaseClient.rpc("current_couple_id");
+    if (coupleError || !coupleId) {
+        littleNoteStatus.textContent = "Could not find the couple link. Check the Supabase setup.";
+        return;
+    }
+    const { error } = await supabaseClient.from("couple_notes").upsert({
+        couple_id: coupleId,
+        note,
+        updated_by: galleryAdminUser.id,
+        updated_at: new Date().toISOString()
+    }, { onConflict: "couple_id" });
+    if (error) {
+        littleNoteStatus.textContent = "Could not sync the note. Check that its Supabase SQL has been run.";
+        return;
+    }
+    setLittleNote(note);
+    littleNoteForm.hidden = true;
+    littleNoteStatus.textContent = "Saved for both of you.";
+});
+updateLittleNoteAccess();
+let r2AdminToken = (() => { try { return sessionStorage.getItem("loveChronicleR2AdminToken") || ""; } catch (_) { return ""; } })();
 
 /* =========================================
    CARTINHAS, MAPA E CHECKLIST DO CASAL
@@ -466,7 +726,6 @@ let galleryAdminIsAllowed = false;
 
 const plansStorageKeys = {
     letters: "loveChronicleLetters",
-    places: "loveChroniclePlaces",
     checklist: "loveChronicleChecklist"
 };
 const planData = Object.fromEntries(Object.entries(plansStorageKeys).map(([key, storageKey]) => {
@@ -474,159 +733,13 @@ const planData = Object.fromEntries(Object.entries(plansStorageKeys).map(([key, 
     catch (_) { return [key, []]; }
 }));
 planData.capsules = [];
-let selectedMapPoint = null;
 let editingLetterId = null;
-let editingPlaceId = null;
 let activeLetterDetail = null;
-let lovePlacesMap = null;
-let lovePlacesMapReady = false;
-let selectedPointMarker = null;
-let taubateDefaultMarker = null;
-let lovePlaceMarkers = [];
 const todayISO = () => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 };
 document.getElementById("letterOpenDate").min = todayISO();
-
-const taubateStartingPoint = { longitude: -45.5553, latitude: -23.0264 };
-selectedMapPoint = taubateStartingPoint;
-document.getElementById("placeName").value = "Taubaté, São Paulo, Brasil";
-document.getElementById("placeCoordinates").textContent = "Ponto inicial selecionado em Taubaté, São Paulo. Você pode mudar o ponto tocando no globo.";
-
-function initializeLovePlacesMap() {
-    const maplibregl = window.maplibregl;
-    if (!maplibregl || lovePlacesMap) return;
-    lovePlacesMap = new maplibregl.Map({
-        container: "loveMapCanvas",
-        style: {
-            version: 8,
-            sources: {
-                imagery: {
-                    type: "raster",
-                    tiles: ["https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
-                    tileSize: 256,
-                    maxzoom: 19,
-                    attribution: "Imagery © Esri, Maxar, Earthstar Geographics, and the GIS User Community"
-                }
-            },
-            layers: [{ id: "world-imagery", type: "raster", source: "imagery" }]
-        },
-        center: [taubateStartingPoint.longitude, taubateStartingPoint.latitude],
-        zoom: 2.1,
-        maxZoom: 18,
-        minZoom: 1.2,
-        attributionControl: { compact: false }
-    });
-    lovePlacesMap.addControl(new maplibregl.NavigationControl({ showCompass: true }), "top-right");
-    lovePlacesMap.on("style.load", () => lovePlacesMap.setProjection({ type: "globe" }));
-    lovePlacesMap.on("moveend", () => { if (lovePlacesMapReady) renderPlaceMarkers(); });
-    lovePlacesMap.on("resize", () => { if (lovePlacesMapReady) renderPlaceMarkers(); });
-    lovePlacesMap.on("click", event => {
-        selectedMapPoint = { longitude: Number(event.lngLat.lng.toFixed(5)), latitude: Number(event.lngLat.lat.toFixed(5)) };
-        if (taubateDefaultMarker) { taubateDefaultMarker.remove(); taubateDefaultMarker = null; }
-        document.getElementById("placeCoordinates").textContent = `Ponto selecionado: ${selectedMapPoint.latitude}°, ${selectedMapPoint.longitude}°. Dê um nome ao lugar ou mantenha Taubaté.`;
-        if (selectedPointMarker) selectedPointMarker.remove();
-        selectedPointMarker = new maplibregl.Marker({ color: "#dc6e86" }).setLngLat([selectedMapPoint.longitude, selectedMapPoint.latitude]).addTo(lovePlacesMap);
-    });
-    lovePlacesMap.on("error", event => {
-        console.warn("Não foi possível carregar o mundo, da uma atualizada ai bb.", event.error);
-        if (!lovePlacesMapReady) {
-            document.getElementById("mapLoading").hidden = false;
-            document.getElementById("mapLoading").textContent = "O globo não carregou bb, Fala com o Samuel kk.";
-        }
-    });
-    lovePlacesMap.once("load", () => {
-        lovePlacesMapReady = true;
-        document.getElementById("mapLoading").hidden = true;
-        renderPlaces();
-    });
-}
-
-window.addEventListener("maplibre-ready", initializeLovePlacesMap, { once: true });
-if (window.maplibregl) initializeLovePlacesMap();
-document.getElementById("mapGoTaubate").addEventListener("click", () => {
-    selectedMapPoint = taubateStartingPoint;
-    document.getElementById("placeName").value = "Taubaté, São Paulo, Brasil";
-    document.getElementById("placeCoordinates").textContent = "Ponto inicial selecionado em Taubaté, São Paulo. Fofinha, vc pode mudar o ponto tocando no globo.";
-    lovePlacesMap?.flyTo({ center: [taubateStartingPoint.longitude, taubateStartingPoint.latitude], zoom: 9, essential: true });
-    if (selectedPointMarker) selectedPointMarker.remove(); selectedPointMarker = null;
-    if (lovePlacesMapReady) renderPlaces();
-});
-
-const mapFullscreenButton = document.getElementById("mapFullscreenButton");
-const loveMapContainer = document.getElementById("loveMap");
-function updateMapFullscreenState() {
-    const active = document.fullscreenElement === loveMapContainer || loveMapContainer.classList.contains("is-fullscreen");
-    mapFullscreenButton.textContent = active ? "× Sair da tela cheia" : "⛶ Tela cheia";
-    mapFullscreenButton.setAttribute("aria-pressed", String(active));
-    document.body.classList.toggle("map-fullscreen-open", active);
-    window.setTimeout(() => lovePlacesMap?.resize(), 80);
-}
-mapFullscreenButton.addEventListener("click", async () => {
-    if (document.fullscreenElement === loveMapContainer || loveMapContainer.classList.contains("is-fullscreen")) {
-        if (document.fullscreenElement) await document.exitFullscreen?.();
-        else loveMapContainer.classList.remove("is-fullscreen");
-        updateMapFullscreenState();
-        return;
-    }
-    if (loveMapContainer.requestFullscreen) {
-        try { await loveMapContainer.requestFullscreen(); }
-        catch (_) { loveMapContainer.classList.add("is-fullscreen"); }
-    } else loveMapContainer.classList.add("is-fullscreen");
-    updateMapFullscreenState();
-});
-document.addEventListener("fullscreenchange", updateMapFullscreenState);
-
-const addressSearchCacheKey = "loveChronicleAddressSearchCache";
-let lastAddressSearchAt = 0;
-document.getElementById("searchPlaceAddress").addEventListener("click", async () => {
-    const query = document.getElementById("placeAddress").value.trim();
-    const status = document.getElementById("addressSearchStatus");
-    const resultsWrap = document.getElementById("addressResultsWrap");
-    const resultsSelect = document.getElementById("addressResults");
-    if (!query) { status.textContent = "Digite uma cidade ou lugar para buscar bb."; return; }
-    const button = document.getElementById("searchPlaceAddress");
-    button.disabled = true; status.textContent = "Buscando opções fofa…"; resultsWrap.hidden = true;
-    try {
-        let cache = {};
-        try { cache = JSON.parse(localStorage.getItem(addressSearchCacheKey) || "{}"); } catch (_) {}
-        const cacheKey = query.toLocaleLowerCase("pt-BR");
-        let found = cache[cacheKey];
-        if (!found) {
-            const wait = Math.max(0, 1100 - (Date.now() - lastAddressSearchAt));
-            if (wait) await new Promise(resolve => window.setTimeout(resolve, wait));
-            lastAddressSearchAt = Date.now();
-            const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=${encodeURIComponent(query)}`;
-            const response = await fetch(url, { headers: { Accept: "application/json" } });
-            if (!response.ok) throw new Error("Busca indisponível");
-            found = await response.json();
-            cache[cacheKey] = found;
-            try { localStorage.setItem(addressSearchCacheKey, JSON.stringify(cache)); } catch (_) {}
-        }
-        if (!found.length) { status.textContent = "Nenhum resultado encontrado amorzinho. Tenta escreve outro ai, esse treco é meio bugado."; return; }
-        resultsSelect.replaceChildren();
-        found.forEach((item, index) => {
-            const option = document.createElement("option"); option.value = String(index); option.textContent = item.display_name; resultsSelect.append(option);
-        });
-        resultsSelect.onchange = () => {
-            const item = found[Number(resultsSelect.value)];
-            if (!item) return;
-            selectedMapPoint = { longitude: Number(item.lon), latitude: Number(item.lat) };
-            document.getElementById("placeName").value = item.display_name.split(",").slice(0, 3).join(",");
-            document.getElementById("placeCoordinates").textContent = `Local selecionado: ${item.display_name}. O ponto foi movido no globo bb.`;
-            if (taubateDefaultMarker) { taubateDefaultMarker.remove(); taubateDefaultMarker = null; }
-            if (selectedPointMarker) selectedPointMarker.remove();
-            selectedPointMarker = new window.maplibregl.Marker({ color: "#dc6e86" }).setLngLat([selectedMapPoint.longitude, selectedMapPoint.latitude]).addTo(lovePlacesMap);
-            lovePlacesMap.flyTo({ center: [selectedMapPoint.longitude, selectedMapPoint.latitude], zoom: Math.max(lovePlacesMap.getZoom(), 9), essential: true });
-        };
-        resultsWrap.hidden = false;
-        resultsSelect.dispatchEvent(new Event("change"));
-        status.textContent = "Escolha uma opção para mover o ponto princesa. © OpenStreetMap contributors.";
-    } catch (_) {
-        status.textContent = "Princesa, desculpa mas foi possível buscar agora. Você ainda pode tocar no globo para escolher o ponto.";
-    } finally { button.disabled = false; }
-});
 
 function savePlanLocally(kind) {
     try { localStorage.setItem(plansStorageKeys[kind], JSON.stringify(planData[kind])); } catch (_) {}
@@ -763,122 +876,6 @@ async function deleteCapsule(capsule) {
     renderCapsules();
 }
 
-function startPlaceEdit(place) {
-    editingPlaceId = place.id;
-    document.getElementById("placeName").value = place.name;
-    document.getElementById("placeKind").value = place.kind;
-    document.getElementById("placeDate").value = place.visited_on || "";
-    document.getElementById("placePhoto").value = "";
-    document.getElementById("placePhotoName").textContent = "Nenhuma foto escolhida";
-    selectedMapPoint = { longitude: Number(place.longitude), latitude: Number(place.latitude) };
-    document.getElementById("placeCoordinates").textContent = `Editando ponto selecionado: ${selectedMapPoint.latitude}°, ${selectedMapPoint.longitude}°. Escolha uma nova foto se quiser substituir a atual bbzinho.`;
-    document.getElementById("savePlaceButton").textContent = "SALVAR ALTERAÇÕES";
-    document.getElementById("cancelPlaceEdit").hidden = false;
-    if (selectedPointMarker) selectedPointMarker.remove();
-    selectedPointMarker = window.maplibregl && lovePlacesMap
-        ? new window.maplibregl.Marker({ color: "#dc6e86" }).setLngLat([selectedMapPoint.longitude, selectedMapPoint.latitude]).addTo(lovePlacesMap)
-        : null;
-    lovePlacesMap?.flyTo({ center: [selectedMapPoint.longitude, selectedMapPoint.latitude], zoom: 9, essential: true });
-    document.getElementById("placeForm").scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
-function cancelPlaceEdit() {
-    editingPlaceId = null;
-    document.getElementById("placeForm").reset();
-    document.getElementById("placePhotoName").textContent = "Nenhuma foto escolhida";
-    document.getElementById("placeName").value = "Taubaté, São Paulo, Brasil";
-    document.getElementById("placeKind").value = "visited";
-    document.getElementById("savePlaceButton").textContent = "ADICIONAR AO MAPA";
-    document.getElementById("cancelPlaceEdit").hidden = true;
-    if (selectedPointMarker) selectedPointMarker.remove();
-    selectedPointMarker = null;
-    selectedMapPoint = taubateStartingPoint;
-    document.getElementById("placeCoordinates").textContent = "Ponto inicial selecionado em Taubaté, São Paulo. Você pode mudar o ponto tocando no globo fofa.";
-    if (lovePlacesMapReady) renderPlaces();
-}
-
-function renderPlaces() {
-    const list = document.getElementById("placesList");
-    list.replaceChildren();
-    renderPlaceMarkers();
-    if (!planData.places.length) list.innerHTML = '<p class="empty-plan-state">Os lugares especiais pra gente vão aparecer aqui.</p>';
-    planData.places.forEach(place => {
-        const card = document.createElement("article");
-        card.className = `place-card${place.kind === "dream" ? " dream" : ""}`;
-        const icon = document.createElement("span"); icon.className = "place-card-icon"; icon.textContent = place.kind === "dream" ? "✦" : "♥";
-        const content = document.createElement("div"); content.className = "place-card-content";
-        if (place.photo_url) { const photo = document.createElement("img"); photo.className = "place-card-photo"; photo.src = place.photo_url; photo.alt = `Abrir foto de ${place.name}`; photo.loading = "lazy"; photo.addEventListener("click", () => openMedia(place.photo_url, `Foto de ${place.name}`, "image")); card.append(photo); }
-        const title = document.createElement("h4"); title.textContent = place.name;
-        const meta = document.createElement("span"); meta.className = "place-meta";
-        meta.textContent = `${place.kind === "dream" ? "Queremos conhecer" : "Já visitamos"}${place.visited_on ? ` · ${planDateLabel(place.visited_on)}` : ""}${place.note ? ` · ${place.note}` : ""}`;
-        content.append(title, meta);
-        const remove = document.createElement("button"); remove.type = "button"; remove.className = "plan-delete"; remove.textContent = "×"; remove.setAttribute("aria-label", `Apagar ${place.name}`);
-        remove.addEventListener("click", () => removePlanItem("places", place.id));
-        const edit = document.createElement("button"); edit.type = "button"; edit.className = "plan-edit"; edit.textContent = "Editar"; edit.setAttribute("aria-label", `Editar ${place.name}`);
-        edit.addEventListener("click", () => startPlaceEdit(place));
-        card.append(icon, content, edit, remove); list.append(card);
-        card.addEventListener("click", event => {
-            if (event.target.closest("button, img")) return;
-            lovePlacesMap?.flyTo({ center: [Number(place.longitude), Number(place.latitude)], zoom: 9, essential: true });
-        });
-    });
-}
-
-function renderPlaceMarkers() {
-    if (!lovePlacesMapReady || !lovePlacesMap || !window.maplibregl) return;
-    lovePlaceMarkers.forEach(marker => marker.remove()); lovePlaceMarkers = [];
-    const taubateIsSaved = planData.places.some(place => Math.abs(Number(place.latitude) - taubateStartingPoint.latitude) < 0.02 && Math.abs(Number(place.longitude) - taubateStartingPoint.longitude) < 0.02);
-    if (taubateIsSaved && taubateDefaultMarker) { taubateDefaultMarker.remove(); taubateDefaultMarker = null; }
-    if (!taubateIsSaved && !taubateDefaultMarker) {
-        const pin = document.createElement("span"); pin.className = "maplibre-place-marker map-marker-placeholder"; pin.textContent = "⌖";
-        const popupContent = document.createElement("div"); popupContent.className = "place-popup";
-        const title = document.createElement("strong"); title.textContent = "Taubaté, São Paulo";
-        const note = document.createElement("span"); note.textContent = "Ponto inicial — adicione a foto de vocês pelo formulário. não esquece."; popupContent.append(title, note);
-        taubateDefaultMarker = new window.maplibregl.Marker({ element: pin, anchor: "center" }).setLngLat([taubateStartingPoint.longitude, taubateStartingPoint.latitude]).setPopup(new window.maplibregl.Popup({ offset: 18 }).setDOMContent(popupContent)).addTo(lovePlacesMap);
-    }
-    const places = planData.places.filter(place => Number.isFinite(Number(place.latitude)) && Number.isFinite(Number(place.longitude)));
-    const projected = places.map(place => ({ place, point: lovePlacesMap.project([Number(place.longitude), Number(place.latitude)]) }))
-        .filter(item => item.point.x >= -80 && item.point.x <= loveMapContainer.clientWidth + 80 && item.point.y >= -80 && item.point.y <= loveMapContainer.clientHeight + 80);
-    const threshold = Math.max(30, 142 - lovePlacesMap.getZoom() * 11);
-    const groups = [];
-    projected.forEach(item => {
-        let group = groups.find(candidate => Math.hypot(candidate.x / candidate.count - item.point.x, candidate.y / candidate.count - item.point.y) < threshold);
-        if (!group) { group = { items: [], x: 0, y: 0, count: 0 }; groups.push(group); }
-        group.items.push(item.place); group.x += item.point.x; group.y += item.point.y; group.count++;
-    });
-    groups.forEach(group => {
-        const primary = group.items[0];
-        const el = document.createElement("button"); el.type = "button";
-        el.className = `maplibre-place-marker${group.count > 1 ? " is-cluster" : ""}${primary.kind === "dream" ? " dream" : ""}`;
-        el.setAttribute("aria-label", group.count > 1 ? `${group.count} lugares agrupados no mapa` : `Ver ${primary.name} no mapa`);
-        group.items.slice(0, 3).forEach((place, index) => {
-            if (!place.photo_url) return;
-            const thumb = document.createElement("img"); thumb.src = place.photo_url; thumb.alt = ""; thumb.loading = "lazy"; thumb.className = `map-marker-thumb thumb-${index}`; el.append(thumb);
-        });
-        if (group.items.every(place => !place.photo_url)) { const fallback = document.createElement("span"); fallback.className = "map-marker-fallback"; fallback.textContent = primary.kind === "dream" ? "✦" : "⌖"; el.append(fallback); }
-        if (group.count > 1) { const count = document.createElement("span"); count.className = "map-cluster-count"; count.textContent = String(group.count); el.append(count); }
-        const center = [group.items.reduce((sum, place) => sum + Number(place.longitude), 0) / group.count, group.items.reduce((sum, place) => sum + Number(place.latitude), 0) / group.count];
-        let popup;
-        if (group.count === 1) {
-            const popupContent = document.createElement("div"); popupContent.className = "place-popup";
-            if (primary.photo_url) { const photo = document.createElement("img"); photo.src = primary.photo_url; photo.alt = `Foto de ${primary.name}`; photo.loading = "lazy"; photo.addEventListener("click", () => openMedia(primary.photo_url, `Foto de ${primary.name}`, "image")); popupContent.append(photo); }
-            const title = document.createElement("strong"); title.textContent = primary.name;
-            const meta = document.createElement("span"); meta.textContent = `${primary.kind === "dream" ? "Queremos conhecer" : "Já fomos"}${primary.visited_on ? ` · ${planDateLabel(primary.visited_on)}` : ""}`; popupContent.append(title, meta);
-            if (primary.note) { const note = document.createElement("p"); note.textContent = primary.note; popupContent.append(note); }
-            popup = new window.maplibregl.Popup({ offset: 22, closeButton: true }).setDOMContent(popupContent);
-        } else if (lovePlacesMap.getZoom() >= 13) {
-            const popupContent = document.createElement("div"); popupContent.className = "place-popup";
-            group.items.forEach(place => { const row = document.createElement("button"); row.type = "button"; row.className = "cluster-place-row"; row.textContent = `${place.photo_url ? "▣ " : "⌖ "}${place.name}`; row.addEventListener("click", () => { lovePlacesMap.flyTo({ center: [Number(place.longitude), Number(place.latitude)], zoom: 15 }); }); popupContent.append(row); });
-            popup = new window.maplibregl.Popup({ offset: 22, closeButton: true }).setDOMContent(popupContent);
-        }
-        const marker = new window.maplibregl.Marker({ element: el, anchor: "center" }).setLngLat(center);
-        if (popup) marker.setPopup(popup);
-        marker.addTo(lovePlacesMap);
-        el.addEventListener("click", event => { if (group.count > 1) { event.stopPropagation(); if (lovePlacesMap.getZoom() < 13) lovePlacesMap.easeTo({ center, zoom: Math.min(13, lovePlacesMap.getZoom() + 2.5), duration: 550 }); } });
-        lovePlaceMarkers.push(marker);
-    });
-}
-
 function renderChecklist() {
     const list = document.getElementById("checklistItems");
     list.replaceChildren();
@@ -897,12 +894,12 @@ function renderChecklist() {
     document.getElementById("checklistProgressBar").style.width = `${total ? (done / total) * 100 : 0}%`;
 }
 
-function renderCouplePlans() { renderLetters(); renderCapsules(); renderPlaces(); renderChecklist(); }
+function renderCouplePlans() { renderLetters(); renderCapsules(); renderChecklist(); }
 
 async function persistPlanItem(kind, item) {
     planData[kind].push(item); savePlanLocally(kind); renderCouplePlans();
     if (!supabaseClient) return false;
-    const table = { letters: "love_letters", places: "love_places", checklist: "love_checklist" }[kind];
+    const table = { letters: "love_letters", checklist: "love_checklist" }[kind];
     const { error } = await supabaseClient.from(table).insert(item);
     if (error) {
         console.error(`Princesa, Não foi possível sincronizar ${table}.`, error);
@@ -915,7 +912,7 @@ async function removePlanItem(kind, id) {
     planData[kind] = planData[kind].filter(item => String(item.id) !== String(id));
     savePlanLocally(kind); renderCouplePlans();
     if (supabaseClient) {
-        const table = { letters: "love_letters", places: "love_places", checklist: "love_checklist" }[kind];
+        const table = { letters: "love_letters", checklist: "love_checklist" }[kind];
         const { error } = await supabaseClient.from(table).delete().eq("id", id);
         if (error) console.error(`Princesa, Não foi possível remover o item de ${table}.`, error);
     }
@@ -933,13 +930,27 @@ async function updateChecklistItem(id, done) {
 
 async function loadCouplePlans() {
     if (!supabaseClient) { renderCouplePlans(); return; }
-    const tables = { letters: "love_letters", places: "love_places", checklist: "love_checklist", capsules: "love_capsules" };
+    const tables = { letters: "love_letters", checklist: "love_checklist", capsules: "love_capsules" };
     await Promise.all(Object.entries(tables).map(async ([kind, table]) => {
         const fields = kind === "capsules" ? "id, title, open_on, author, created_at" : "*";
         const { data, error } = await supabaseClient.from(table).select(fields).order("created_at", { ascending: true });
         if (error) { console.warn(`Princesa, Não foi possível carregar ${table}; mantendo os dados locais, chama o Samuel.`, error); return; }
-        if (kind === "capsules") planData.capsules = data || [];
-        else { planData[kind] = data || []; savePlanLocally(kind); }
+        let rows = data || [];
+        if (kind === "letters" && rows.length === 0 && planData.letters.length > 0) {
+            const migratedLetters = [];
+            for (const letter of planData.letters) {
+                const { data: savedLetter, error: saveError } = await supabaseClient
+                    .from(table).insert(letter).select("*").single();
+                if (saveError) {
+                    console.warn("As cartinhas antigas continuam salvas neste aparelho; não foi possível migrá-las ainda.", saveError);
+                    return;
+                }
+                migratedLetters.push(savedLetter);
+            }
+            rows = migratedLetters;
+        }
+        if (kind === "capsules") planData.capsules = rows;
+        else { planData[kind] = rows; savePlanLocally(kind); }
     }));
     if (galleryAdminIsAllowed) {
         const dueIds = planData.capsules.filter(item => item.open_on <= todayISO()).map(item => item.id);
@@ -1037,8 +1048,7 @@ document.getElementById("capsuleForm").addEventListener("submit", async event =>
 });
 
 document.getElementById("goToAdminLogin").addEventListener("click", () => {
-    openPage("photos");
-    window.setTimeout(() => document.getElementById("galleryAdminEmail").focus({ preventScroll: true }), 250);
+    openSettings(true);
 });
 
 document.getElementById("closeLetterDetail").addEventListener("click", closeLetterDetail);
@@ -1046,74 +1056,6 @@ document.getElementById("letterDetailModal").addEventListener("click", event => 
     if (event.target.id === "letterDetailModal") closeLetterDetail();
 });
 document.addEventListener("keydown", event => { if (event.key === "Escape" && !document.getElementById("letterDetailModal").hidden) closeLetterDetail(); });
-
-document.getElementById("placePhoto").addEventListener("change", event => {
-    const file = event.currentTarget.files?.[0];
-    document.getElementById("placePhotoName").textContent = file ? file.name : "Nenhuma foto escolhida";
-});
-
-document.getElementById("placeForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    const status = document.getElementById("placeStatus");
-    if (!selectedMapPoint) { status.textContent = "Toque no globo para escolher onde fica o lugar."; return; }
-    const photoInput = document.getElementById("placePhoto");
-    const photoFile = photoInput.files[0];
-    const placeName = document.getElementById("placeName").value.trim();
-    if (!placeName) { status.textContent = "Dê um nome para este lugar."; return; }
-    if (photoFile && (!photoFile.type.startsWith("image/") || photoFile.size > 25 * 1024 * 1024)) {
-        status.textContent = "Princesa, escolha uma foto de até 25 MB."; return;
-    }
-    let photoUrl = null;
-    let photoPath = null;
-    if (photoFile) {
-        if (!supabaseClient) { status.textContent = "Princesa, Para guardar a foto e ver em outros lugars, configure o Supabase primeiro."; return; }
-        status.textContent = "Enviando foto…";
-        const safeName = photoFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        photoPath = `places/${crypto.randomUUID()}-${safeName}`;
-        const { error: photoError } = await supabaseClient.storage.from("memories").upload(photoPath, photoFile, { contentType: photoFile.type, upsert: false });
-        if (photoError) { console.error("Não foi possível enviar a foto do lugar.", photoError); status.textContent = "Princesa, Não foi possível enviar a foto. Talvez seja pesado, ou o tipo do arquivo."; return; }
-        photoUrl = supabaseClient.storage.from("memories").getPublicUrl(photoPath).data.publicUrl;
-    } else if (editingPlaceId) {
-        const existingPlace = planData.places.find(item => String(item.id) === String(editingPlaceId));
-        photoUrl = existingPlace?.photo_url || null;
-        photoPath = existingPlace?.photo_path || null;
-    }
-    const currentPlace = planData.places.find(item => String(item.id) === String(editingPlaceId));
-    const place = {
-        id: editingPlaceId || crypto.randomUUID(), name: placeName, kind: document.getElementById("placeKind").value,
-        note: currentPlace?.note || "", visited_on: document.getElementById("placeDate").value || null,
-        photo_url: photoUrl, photo_path: photoPath, ...selectedMapPoint,
-        created_at: planData.places.find(item => String(item.id) === String(editingPlaceId))?.created_at || new Date().toISOString()
-    };
-    let synced = false;
-    if (editingPlaceId) {
-        if (supabaseClient) {
-            const { data, error } = await supabaseClient.from("love_places").update(place).eq("id", editingPlaceId).select("*").single();
-            if (error) { status.textContent = "Baby, Não foi possível atualizar este lugar. Avisa o Samuel que o sistema caiu."; return; }
-            planData.places = planData.places.map(item => String(item.id) === String(editingPlaceId) ? data : item);
-            synced = true;
-        } else {
-            planData.places = planData.places.map(item => String(item.id) === String(editingPlaceId) ? place : item);
-        }
-        savePlanLocally("places"); renderPlaces();
-    } else {
-        synced = await persistPlanItem("places", place);
-    }
-    const wasEditing = Boolean(editingPlaceId);
-    editingPlaceId = null;
-    document.getElementById("placeForm").reset(); selectedMapPoint = taubateStartingPoint;
-    document.getElementById("placePhotoName").textContent = "Nenhuma foto escolhida";
-    document.getElementById("placeName").value = "Taubaté, São Paulo, Brasil";
-    document.getElementById("placeKind").value = "visited";
-    document.getElementById("savePlaceButton").textContent = "ADICIONAR AO MAPA";
-    document.getElementById("cancelPlaceEdit").hidden = true;
-    document.getElementById("placeCoordinates").textContent = "Ponto inicial selecionado em Taubaté, São Paulo. Você pode mudar o ponto tocando no globo.";
-    if (selectedPointMarker) selectedPointMarker.remove(); selectedPointMarker = null;
-    lovePlacesMap?.flyTo({ center: [taubateStartingPoint.longitude, taubateStartingPoint.latitude], zoom: 3.5 });
-    status.textContent = synced ? (wasEditing ? "Lugar atualizado pra nós dois" : "Lugar e foto guardados pra nós dois") : (wasEditing ? "Lugar atualizado neste navegador." : "Lugar guardado neste navegador. Configure o SQL do Supabase para enviar na nuvem, avisa pro Samuel que o sistema ta ruim.");
-});
-
-document.getElementById("cancelPlaceEdit").addEventListener("click", cancelPlaceEdit);
 
 document.getElementById("checklistForm").addEventListener("submit", async event => {
     event.preventDefault();
@@ -1270,14 +1212,6 @@ function renderTimeline() {
             nextStep.innerHTML = "Escolher nosso próximo capítulo <span>→</span>";
             nextStep.addEventListener("click", () => openPage("our-plans"));
             content.append(nextStep);
-        } else {
-            const location = document.createElement("button");
-            location.type = "button";
-            location.className = "timeline-location";
-            location.setAttribute("aria-label", "Abrir nosso mapa");
-            location.innerHTML = '<span class="timeline-globe" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><path d="M4 24h40M24 3c7 6 10 13 10 21S31 39 24 45M24 3c-7 6-10 13-10 21s3 15 10 21M8 12h32M8 36h32"/></svg><i>♥</i></span><span><strong>LOCAL DA LEMBRANÇA</strong><small>Marcar no nosso mapa <b>↗</b></small></span>';
-            location.addEventListener("click", () => openPage("our-plans"));
-            content.append(location);
         }
         card.append(content);
         item.append(date, dot, card);
@@ -1655,6 +1589,79 @@ function sortGalleryItems(items) {
         }).map(entry => entry.item);
 }
 
+function mediaApiBase() {
+    return String(window.CLOUDFLARE_MEDIA_API || "").trim().replace(/\/+$/, "");
+}
+
+async function mediaApi(path, options = {}) {
+    const base = mediaApiBase();
+    if (!base) throw new Error("Configure a URL do Cloudflare Worker em cloudflare-config.js.");
+    const headers = new Headers(options.headers || {});
+    if (r2AdminToken) headers.set("Authorization", `Bearer ${r2AdminToken}`);
+    const response = await fetch(`${base}${path}`, { ...options, headers });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || `O serviço de mídia respondeu ${response.status}.`);
+    return result;
+}
+
+function updateR2AdminUI() {
+    const password = document.getElementById("r2AdminPassword");
+    const loginButton = document.getElementById("r2AdminLoginButton");
+    const logoutButton = document.getElementById("r2AdminLogoutButton");
+    const status = document.getElementById("r2AdminStatus");
+    password.hidden = r2AdminIsAllowed;
+    loginButton.hidden = r2AdminIsAllowed;
+    logoutButton.hidden = !r2AdminIsAllowed;
+    if (!mediaApiBase()) status.textContent = "Falta configurar a URL do Worker para ativar o envio ao Cloudflare R2.";
+    else if (r2AdminIsAllowed) status.textContent = "Acesso da galeria liberado neste aparelho.";
+    document.querySelectorAll(".gallery-delete-button").forEach(button => { button.hidden = !r2AdminIsAllowed; });
+}
+
+async function loginR2Admin() {
+    const status = document.getElementById("r2AdminStatus");
+    const password = document.getElementById("r2AdminPassword").value;
+    if (!password) { status.textContent = "Digite a senha de administração da galeria."; return; }
+    try {
+        const result = await mediaApi("/api/admin/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password })
+        });
+        r2AdminToken = result.token;
+        sessionStorage.setItem("loveChronicleR2AdminToken", r2AdminToken);
+        r2AdminIsAllowed = true;
+        document.getElementById("r2AdminPassword").value = "";
+        updateR2AdminUI();
+        status.textContent = "Acesso da galeria liberado neste aparelho.";
+    } catch (error) {
+        console.error("Não foi possível entrar no Cloudflare Worker.", error);
+        status.textContent = error.message || "Não foi possível entrar. Confira a senha e a configuração do Worker.";
+    }
+}
+
+function logoutR2Admin() {
+    r2AdminToken = "";
+    r2AdminIsAllowed = false;
+    try { sessionStorage.removeItem("loveChronicleR2AdminToken"); } catch (_) {}
+    updateR2AdminUI();
+    document.getElementById("r2AdminStatus").textContent = "Você saiu da administração da galeria.";
+}
+
+async function refreshR2AdminSession() {
+    if (!r2AdminToken || !mediaApiBase()) { updateR2AdminUI(); return; }
+    try {
+        await mediaApi("/api/admin/session");
+        r2AdminIsAllowed = true;
+    } catch (_) {
+        logoutR2Admin();
+    }
+    updateR2AdminUI();
+}
+
+document.getElementById("r2AdminLoginButton").addEventListener("click", loginR2Admin);
+document.getElementById("r2AdminPassword").addEventListener("keydown", event => { if (event.key === "Enter") loginR2Admin(); });
+document.getElementById("r2AdminLogoutButton").addEventListener("click", logoutR2Admin);
+
 function addGalleryItem(memory) {
     const item = document.createElement("div");
     item.className = "gallery-item";
@@ -1685,7 +1692,7 @@ function addGalleryItem(memory) {
         deleteButton.textContent = "×";
         deleteButton.setAttribute("aria-label", `Apagar ${memory.title || "foto da galeria"}`);
         deleteButton.title = "Apagar esta lembrança";
-        deleteButton.hidden = !galleryAdminIsAllowed;
+        deleteButton.hidden = !r2AdminIsAllowed;
         deleteButton.addEventListener("click", () => deleteGalleryMemory(memory.id));
         item.appendChild(deleteButton);
     }
@@ -1709,10 +1716,10 @@ function updateGalleryAdminUI() {
     } else if (galleryAdminUser) {
         message.textContent = "Esta conta não tem permissão pra nada, recomendo sair, ladrãozinho. ou vc errou msm.";
     } else {
-        message.textContent = "Entre como ADM pra editar ou apagar fotos e notícias de tudo.";
+        message.textContent = "Entre como ADM para organizar as fotos de vocês.";
     }
     document.querySelectorAll(".gallery-delete-button").forEach(button => {
-        button.hidden = !galleryAdminIsAllowed;
+        button.hidden = !r2AdminIsAllowed;
     });
 }
 
@@ -1725,6 +1732,7 @@ async function refreshGalleryAdminPermission() {
     }
     if (!galleryAdminIsAllowed) planData.capsules.forEach(capsule => { delete capsule.message; });
     updateGalleryAdminUI();
+    await loadLittleNote();
     renderNews();
     await loadCouplePlans();
 }
@@ -1756,6 +1764,7 @@ async function loginGalleryAdmin() {
 }
 
 async function logoutGalleryAdmin() {
+    if (window.stopCoupleLocationSharing) await window.stopCoupleLocationSharing({ silent: true });
     const { error } = await supabaseClient.auth.signOut();
     if (error) {
         document.getElementById("galleryAdminStatus").textContent = "Não foi possível sair da conta. bugou";
@@ -1769,39 +1778,19 @@ async function logoutGalleryAdmin() {
 }
 
 async function deleteGalleryMemory(memoryId) {
-    if (!galleryAdminIsAllowed) return;
+    if (!r2AdminIsAllowed) return;
     const memory = uploadedMemories.find(item => item.id === memoryId);
     if (!memory) return;
     const confirmed = window.confirm(`Apagar “${memory.title || memory.comment || "esta foto"}” da galeria? Essa ação não pode ser desfeita.`);
     if (!confirmed) return;
 
-    const status = document.getElementById("galleryAdminStatus");
+    const status = document.getElementById("r2AdminStatus");
     status.textContent = "Apagando lembrança…";
-    const { data: removedFiles, error: storageError } = await supabaseClient.storage
-        .from("memories")
-        .remove([memory.filePath]);
-    if (storageError) {
-        console.error(storageError);
-        status.textContent = "O sistema recusou apagar o arquivo. Chama o Samuel agora, se não vai explodir.";
-        return;
-    }
-    if (!removedFiles?.some(file => file.name === memory.filePath)) {
-        console.error("Supabase não retornou o arquivo removido.", { filePath: memory.filePath, removedFiles });
-        status.textContent = "O Sistema não confirmou a exclusão. Execute novamente o supabase-setup.sql atualizado (ele libera SELECT e DELETE para o administrador) ou, Chama o Samuel ai";
-        return;
-    }
-    const { data: deletedRows, error: rowError } = await supabaseClient
-        .from("memories")
-        .delete()
-        .eq("id", memoryId)
-        .select("id");
-    if (rowError) {
-        console.error(rowError);
-        status.textContent = "O arquivo foi apagado, mas não foi possível remover o registro da galeria bb, desculpa.";
-        return;
-    }
-    if (!deletedRows?.length) {
-        status.textContent = "O arquivo foi apagado bb, mas o Supabase não removeu o registro. Confira a policy de DELETE em memories.";
+    try {
+        await mediaApi(`/api/memories/${encodeURIComponent(memoryId)}`, { method: "DELETE" });
+    } catch (error) {
+        console.error("Não foi possível apagar a lembrança do R2.", error);
+        status.textContent = error.message || "O Worker não confirmou a exclusão da lembrança.";
         return;
     }
 
@@ -1811,7 +1800,8 @@ async function deleteGalleryMemory(memoryId) {
         .find(item => item.dataset.memoryId === memoryId);
     galleryItem?.remove();
     renderGalleryPage(1);
-    status.textContent = "Lembrança apagada da galeria.";
+    status.textContent = "Lembrança apagada do Cloudflare R2.";
+    document.getElementById("uploadStatus").textContent = status.textContent;
 }
 
 window.loginGalleryAdmin = loginGalleryAdmin;
@@ -1820,42 +1810,34 @@ window.logoutGalleryAdmin = logoutGalleryAdmin;
 renderGalleryPage(1);
 
 async function loadSavedMemories() {
-    if (!supabaseClient) return;
     try {
-        const { data: records, error } = await supabaseClient
-            .from("memories")
-            .select("id, title, subtitle, category, media_type, file_path, created_at")
-            .order("created_at", { ascending: true });
-        if (error) throw error;
-
-        const savedMemories = records.map(record => {
-            const { data } = supabaseClient.storage.from("memories").getPublicUrl(record.file_path);
-            return {
-                id: record.id,
-                image: data.publicUrl,
-                title: record.title,
-                comment: record.subtitle,
-                type: record.media_type,
-                category: record.category,
-                filePath: record.file_path,
-                createdAt: record.created_at
-            };
-        });
+        const { memories: records } = await mediaApi("/api/memories");
+        const savedMemories = records.map(record => ({
+            id: record.id,
+            image: record.url,
+            title: record.title,
+            comment: record.subtitle,
+            type: record.media_type,
+            category: record.category,
+            filePath: record.file_key,
+            createdAt: record.created_at
+        }));
         document.querySelectorAll(".gallery-item[data-uploaded='true']").forEach(item => item.remove());
         savedMemories.forEach(addGalleryItem);
         uploadedMemories = savedMemories.slice().reverse();
         refreshMemoryCarousel();
         renderGalleryPage(1);
     } catch (error) {
-        console.error("Não foi possível carregar as lembranças do Supabase.", error);
-        document.getElementById("uploadStatus").textContent = "Não foi possível carregar as nossas lembranças princesa. Confira a configuração do Supabase.";
+        console.error("Não foi possível carregar as lembranças do Cloudflare R2.", error);
+        document.getElementById("uploadStatus").textContent = error.message || "Não foi possível carregar as lembranças do Cloudflare R2.";
     }
 }
 
 async function initializeSupabase() {
+    await refreshR2AdminSession();
+    await loadSavedMemories();
     if (!supabaseClient) {
         updateGalleryAdminUI();
-        document.getElementById("uploadStatus").textContent = "O Supabase não carregou. Verifique a URL, a Publishable key e a conexão.";
         return;
     }
     const { data, error } = await supabaseClient.auth.getSession();
@@ -1863,14 +1845,7 @@ async function initializeSupabase() {
     galleryAdminUser = data?.session?.user || null;
     await refreshGalleryAdminPermission();
     await loadDateIdeasFromCloud();
-    await loadSavedMemories();
     await loadTimelineChapters();
-    try {
-        await loadSavedNews();
-    } catch (newsError) {
-        console.error("Não foi possível carregar as notícias salvas princesa.", newsError);
-        document.getElementById("newsStatus").textContent = "Não foi possível carregar as notícias salvas princesa. Execute o SQL atualizado do Supabase.";
-    }
     await loadCouplePlans();
     supabaseClient.auth.onAuthStateChange((_event, session) => {
         galleryAdminUser = session?.user || null;
@@ -1889,8 +1864,12 @@ async function addMemoryUpload() {
     const categoryInput = document.getElementById("memoryUploadCategory");
     const status = document.getElementById("uploadStatus");
     const file = fileInput.files[0];
-    if (!supabaseClient) {
-        status.textContent = "O armazenamento não está disponível, Provavelmente acabou tudo, Chama o Samuel.";
+    if (!mediaApiBase()) {
+        status.textContent = "Configure primeiro o Worker do Cloudflare em cloudflare-config.js.";
+        return;
+    }
+    if (!r2AdminIsAllowed) {
+        status.textContent = "Entre na administração da galeria antes de enviar fotos ou vídeos.";
         return;
     }
     const title = titleInput.value.trim();
@@ -1903,49 +1882,34 @@ async function addMemoryUpload() {
         status.textContent = "Escolha um arquivo de imagem ou vídeo válido, logico.";
         return;
     }
-    if (file.size > 100 * 1024 * 1024) {
-        status.textContent = "O arquivo precisa ter até 100 MB, não esquece.";
+    if (file.size > 95 * 1024 * 1024) {
+        status.textContent = "O arquivo precisa ter até 95 MB.";
         return;
     }
     const mediaType = file.type.startsWith("video/") ? "video" : "image";
-    const filePath = `${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-    status.textContent = "Enviando arquivo para nuvem…";
+    const uploadButton = document.getElementById("uploadMemoryButton");
+    uploadButton.disabled = true;
+    status.textContent = `Enviando ${mediaType === "video" ? "vídeo" : "foto"} para o Cloudflare R2…`;
     try {
-        const { error: storageError } = await supabaseClient.storage
-            .from("memories")
-            .upload(filePath, file, { contentType: file.type, upsert: false });
-        if (storageError) throw storageError;
-
-        const { data: publicFile } = supabaseClient.storage.from("memories").getPublicUrl(filePath);
-        const { data: inserted, error: rowError } = await supabaseClient
-            .from("memories")
-            .insert({
-                title,
-                subtitle,
-                category: categoryInput.value,
-                media_type: mediaType,
-                file_path: filePath
-            })
-            .select("id, created_at")
-            .single();
-        if (rowError) {
-            await supabaseClient.storage.from("memories").remove([filePath]);
-            throw rowError;
-        }
-
+        const uploadDetails = new URLSearchParams({ title, subtitle, category: categoryInput.value, filename: file.name });
+        const { memory: inserted } = await mediaApi(`/api/memories?${uploadDetails}`, {
+            method: "POST",
+            headers: { "Content-Type": file.type },
+            body: file
+        });
         const memory = {
             id: inserted.id,
-            image: publicFile.publicUrl,
-            title,
-            comment: subtitle,
-            type: mediaType,
-            category: categoryInput.value,
-            filePath,
+            image: inserted.url,
+            title: inserted.title,
+            comment: inserted.subtitle,
+            type: inserted.media_type,
+            category: inserted.category,
+            filePath: inserted.file_key,
             createdAt: inserted.created_at
         };
         uploadedMemories.unshift(memory);
         addGalleryItem(memory);
-        if (subtitle) refreshMemoryCarousel(inserted.id);
+        refreshMemoryCarousel(subtitle ? inserted.id : null);
         const galleryItems = Array.from(document.querySelector(".gallery").children);
         const matchingCount = galleryItems.filter(item => activeGalleryFilter === "all"
             || (activeGalleryFilter === "videos" && (item.dataset.type === "video" || item.dataset.category === "videos"))
@@ -1959,11 +1923,13 @@ async function addMemoryUpload() {
         subtitleInput.value = "";
         categoryInput.value = "us";
         status.textContent = subtitle
-            ? "Foto enviada para a galeria e adicionada ao carrosselzao de lembranças"
-            : "Foto enviada para a galeria. Só galeria bb, ela ficou fora do carrossel.";
+            ? `${mediaType === "video" ? "Vídeo" : "Foto"} enviada ao Cloudflare R2 e adicionada ao carrossel de lembranças.`
+            : `${mediaType === "video" ? "Vídeo" : "Foto"} enviada ao Cloudflare R2 e guardada na galeria.`;
     } catch (error) {
-        console.error("Falha ao enviar mídia na nuvem (-_-)", error);
-        status.textContent = "Não foi possível enviar bb. Verifique sua conexão e as políticas configuradas no Supabase.";
+        console.error("Falha ao enviar mídia para o Cloudflare R2.", error);
+        status.textContent = error.message || "Não foi possível enviar. Confira a conexão com o Cloudflare Worker.";
+    } finally {
+        uploadButton.disabled = false;
     }
 }
 
@@ -2004,8 +1970,6 @@ function openPage(pageName) {
     if (selectedButton) {
         selectedButton.classList.add("active");
     }
-
-    if (pageName === "our-plans") window.setTimeout(() => lovePlacesMap?.resize(), 180);
 
     window.scrollTo({
         top: 0,
@@ -2069,6 +2033,8 @@ let newsPage = 1;
 function renderNews(page = newsPage) {
     const homeContainer = document.getElementById("homeNews");
     const allContainer = document.getElementById("allNews");
+    const pagination = document.getElementById("newsPagination");
+    if (!homeContainer || !allContainer || !pagination) return;
     homeContainer.replaceChildren();
     allContainer.replaceChildren();
 
@@ -2109,7 +2075,6 @@ function renderNews(page = newsPage) {
     visibleNews.forEach(item => allContainer.appendChild(createNewsElement(item, true)));
     news.slice(0, 2).forEach(item => homeContainer.appendChild(createNewsElement(item, false)));
 
-    const pagination = document.getElementById("newsPagination");
     pagination.replaceChildren();
     for (let number = 1; number <= pageCount; number++) {
         const button = document.createElement("button");

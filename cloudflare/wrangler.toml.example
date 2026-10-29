@@ -1,0 +1,16 @@
+name = "our-love-story-media"
+main = "worker.js"
+compatibility_date = "2026-10-29"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "our-love-story-media"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "our-love-story-data"
+database_id = "COLE_AQUI_O_ID_DO_D1"
+
+[vars]
+# Use only the origin part, without a path. Example: https://seuusuario.github.io
+ALLOWED_ORIGINS = "https://SEU_USUARIO.github.io,capacitor://localhost,https://localhost"

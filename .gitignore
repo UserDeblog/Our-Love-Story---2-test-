@@ -7,3 +7,4 @@ android/app/build/
 ios/Pods/
 ios/build/
 ios/DerivedData/
+cloudflare/wrangler.toml

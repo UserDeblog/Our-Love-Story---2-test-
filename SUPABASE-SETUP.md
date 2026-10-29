@@ -1,25 +1,24 @@
-# Supabase setup
+# Supabase for private couple data
 
-The site uses the Supabase project URL and publishable key in `supabase-config.js`. A publishable key is intended to be visible in browser code. Never put a Supabase secret key in this repository or in browser code.
+The app now points to the new Supabase project through `supabase-config.js`. The publishable key is safe for client use; never put a Supabase secret/service-role key in this repository or in the app.
 
-## Configure the project
+## Set up the new project
 
-1. In the Supabase Dashboard, open **SQL Editor** and run the latest `supabase-setup.sql`. If you ran an earlier version, run this updated script again.
-2. To enable delete controls, create your admin account in **Authentication → Users** and add its email to `public.gallery_admins`:
+1. In **Authentication → Users**, confirm that both accounts exist. The setup SQL references the two user IDs supplied for this project and will fail if either ID is missing or already linked.
+2. Open **SQL Editor**, create a new query, paste all of `supabase-private-setup.sql`, and run it once. It creates private couple tables and row-level security policies for letters, capsules, and location sharing. Anonymous visitors receive no access to these records.
+3. Run `supabase-little-note-setup.sql` once in another SQL Editor query. This adds the shared, private note.
+4. Sign in from the app with either account. The current admin login now treats linked couple members as authorized users.
 
-   ```sql
-   insert into public.gallery_admins (email)
-   values ('you@example.com')
-   on conflict (email) do nothing;
-   ```
+Do not run the older `supabase-setup.sql` on this new project. It was designed for the previous app setup and contains public policies for some tables.
 
-3. Publish the updated `index.html`, `script.js`, `style.css`, and `supabase-config.js` through GitHub Pages.
-4. Uploads and Daily News publishing remain available without signing in. To edit or delete a saved news item, or delete an uploaded memory, sign in as the allowlisted admin from **Our Photos**. News entries are stored in `public.daily_news` and remain available to all visitors.
+## Current scope
 
-5. In **Nossos Planos**, cartinhas open in their own reading view. Only an allowlisted admin can edit or delete them, and each card's permissions control whether those actions are allowed. Create capsules while signed in as an admin. Capsule dates and titles are visible on the site, but the writing is stored separately in `public.love_capsule_contents`; its row policy allows reading only to an allowlisted admin after the opening date. Run the latest SQL before using these features across devices.
+The app synchronizes love letters and capsules through this project. When an authenticated device first connects to an empty project, existing local love letters are copied to the new database instead of being overwritten. Other areas such as timeline, checklist, and date ideas can continue using this device's local storage for now.
 
-The `memories` Storage bucket is public for reading and accepts images and videos up to 100 MB. Anyone with the public site link can upload files and add entries to the gallery; only allowlisted admins can view Storage metadata for deletion and delete Supabase uploads. Storage deletion requires both `SELECT` and `DELETE` policies. Photos stored in the repository itself must be removed from the project files. The two-person audience is not technically enforced by a public GitHub Pages link.
+The **A little note** section can be edited by either linked account and syncs to both phones. The note text and the captions for the 18 rotating **Little moments** photos can be changed in `index.html`.
 
-## Exposed secret key
+The location page is available under **World**. Each signed-in member must tap **Share my location** on their own device and grant the requested system permissions. The database rules let each member write only their own location and read the partner's latest location only while that partner has sharing enabled.
 
-A secret key was pasted into the chat. Revoke that key in **Project Settings → API Keys**. The site does not use a secret key; only the publishable key belongs in `supabase-config.js`.
+The app uses a native Capacitor background-location plugin. On Android, a persistent notification is shown while sharing. On iPhone, background location requires **Always** permission and iOS may stop updates after the app is force-closed. Map tiles are loaded from OpenStreetMap, which receives the map coordinates needed to display the requested area.
+
+Storage/gallery uploads continue to use the separate Cloudflare R2 setup described in `CLOUDFLARE-R2-SETUP.md`.

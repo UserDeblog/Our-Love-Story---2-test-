@@ -2,6 +2,9 @@
   "appId": "com.ourlovestory.couple",
   "appName": "Our Love Story",
   "webDir": "www",
+  "android": {
+    "useLegacyBridge": true
+  },
   "ios": {
     "contentInset": "automatic"
   }
