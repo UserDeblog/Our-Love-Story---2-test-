@@ -173,44 +173,6 @@ create policy "Members can delete capsule contents" on public.love_capsule_conte
         )
     );
 
-create table if not exists public.location_shares (
-    user_id uuid primary key references auth.users(id) on delete cascade,
-    couple_id uuid not null default public.current_couple_id() references public.couples(id) on delete cascade,
-    latitude double precision not null check (latitude between -90 and 90),
-    longitude double precision not null check (longitude between -180 and 180),
-    accuracy_m double precision check (accuracy_m is null or accuracy_m >= 0),
-    sharing boolean not null default false,
-    updated_at timestamptz not null default now(),
-    constraint location_share_owner_is_member check (user_id is not null)
-);
-alter table public.location_shares enable row level security;
-revoke all on public.location_shares from public, anon, authenticated;
-grant select, insert, update, delete on public.location_shares to authenticated;
-
-drop policy if exists "Members can read own or shared partner location" on public.location_shares;
-create policy "Members can read own or shared partner location" on public.location_shares
-    for select to authenticated using (
-        user_id = (select auth.uid())
-        or (
-            sharing
-            and couple_id = (select public.current_couple_id())
-        )
-    );
-drop policy if exists "Members can publish their own location" on public.location_shares;
-create policy "Members can publish their own location" on public.location_shares
-    for insert to authenticated with check (
-        user_id = (select auth.uid())
-        and couple_id = (select public.current_couple_id())
-    );
-drop policy if exists "Members can update their own location" on public.location_shares;
-create policy "Members can update their own location" on public.location_shares
-    for update to authenticated
-    using (user_id = (select auth.uid()) and couple_id = (select public.current_couple_id()))
-    with check (user_id = (select auth.uid()) and couple_id = (select public.current_couple_id()));
-drop policy if exists "Members can delete their own location" on public.location_shares;
-create policy "Members can delete their own location" on public.location_shares
-    for delete to authenticated using (user_id = (select auth.uid()));
-
 -- Pair the two Auth users. Run once after both users exist in Authentication > Users.
 -- If either ID is wrong or already belongs to a different pair, the transaction fails.
 do $$

@@ -17,16 +17,10 @@ importers:
       '@capacitor/ios':
         specifier: ^8.0.0
         version: 8.5.3(@capacitor/core@8.5.3)
-      '@capgo/background-geolocation':
-        specifier: ^8.5.0
-        version: 8.5.0(@capacitor/core@8.5.3)
     devDependencies:
       '@capacitor/cli':
         specifier: ^8.0.0
         version: 8.5.3
-      esbuild:
-        specifier: ~0.25.12
-        version: 0.25.12
 
 packages:
 

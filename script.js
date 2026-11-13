@@ -70,8 +70,7 @@ const countdownEvents = [
     { key: "christmas", title: "Christmas", icon: "🎄", month: 11, day: 25, dateLabel: "December 25", message: "Merry Christmas! 🎄" },
     { key: "new-year", title: "New Year’s Day", icon: "✨", month: 0, day: 1, dateLabel: "January 1", message: "Another year, together. ✨" },
     { key: "samuel-birthday", title: "Samuel’s birthday", icon: "🎂", month: 3, day: 17, dateLabel: "April 17", message: "Happy birthday, Samuel! 💖" },
-    { key: "relationship-anniversary", title: "Our anniversary", icon: "💞", month: 3, day: 3, dateLabel: "April 3", message: "One more year of us. 💞" },
-    { key: "valentines", title: "Valentine’s Day (Brazil)", icon: "💌", month: 5, day: 12, dateLabel: "June 12", message: "Happy Dia dos Namorados! 💌" }
+    { key: "relationship-anniversary", title: "Our anniversary", icon: "💞", month: 3, day: 3, dateLabel: "April 3", message: "One more year of us. 💞" }
 ];
 
 function getCountdownTarget(event, now = new Date()) {
@@ -253,7 +252,6 @@ const MUSIC_PLAYLISTS = ["Animadas", "Calmas", "Piano", "Românticas"];
 
 const backgroundMusic = document.getElementById("backgroundMusic");
 document.querySelector(".header-actions")?.append(document.getElementById("musicMixer"));
-document.querySelector(".floating-action-stack")?.remove();
 backgroundMusic.crossOrigin = "anonymous";
 const musicTrackSelect = document.getElementById("musicTrackSelect");
 const musicPlaylistSelect = document.getElementById("musicPlaylistSelect");
@@ -269,6 +267,7 @@ let activePlaylist = "all";
 let musicAudioContext = null;
 let musicGainNode = null;
 let musicMediaSource = null;
+let musicPlaylistLoadStarted = false;
 
 function getMusicVolume() {
     return Number(document.getElementById("musicVolume").value);
@@ -322,6 +321,7 @@ musicMixerToggle.addEventListener("click", () => {
     musicMixerToggle.setAttribute("aria-label", `${isOpen ? "Fechar" : "Abrir"} mixer de música`);
     musicMixerToggle.title = `${isOpen ? "Fechar" : "Abrir"} mixer de música`;
     musicMixerPanel.setAttribute("aria-hidden", String(!isOpen));
+    if (isOpen) void loadBackgroundPlaylist();
 });
 
 document.getElementById("memoryFile")?.addEventListener("change", event => {
@@ -451,6 +451,8 @@ if (savedMusicVolume !== null) document.getElementById("musicVolume").value = sa
 applyMusicVolume(getMusicVolume());
 
 async function loadBackgroundPlaylist() {
+    if (musicPlaylistLoadStarted) return;
+    musicPlaylistLoadStarted = true;
     musicStatus.textContent = "Carregando músicas…";
     musicTrackSelect.disabled = true;
     musicPlaylistSelect.disabled = true;
@@ -506,12 +508,11 @@ async function loadBackgroundPlaylist() {
         musicPlayPause.disabled = false;
         loadBackgroundTrack(0);
     } catch (error) {
+        musicPlaylistLoadStarted = false;
         console.error("Não foi possível listar as músicas no GitHub.", error);
         musicStatus.textContent = "Não consegui carregar as músicas do GitHub";
     }
 }
-
-loadBackgroundPlaylist();
 
 document.addEventListener("pointerdown", event => {
     if (event.target.closest(".music-mixer")) return;
@@ -525,32 +526,32 @@ document.addEventListener("pointerdown", event => {
 
 const memories = [
     {
-        image: "images/foto1.jpg",
+        image: "images/web/foto1.jpg",
         title: "One of those days we lost track of time",
         comment: "We had nowhere else to be. I wish we could do that more often."
     },
     {
-        image: "images/foto2.jpg",
+        image: "images/web/foto2.jpg",
         title: "Our first sunset together",
         comment: "That evening at the lookout still comes to mind whenever I see a good sunset."
     },
     {
-        image: "images/foto3.jpg",
+        image: "images/web/foto3.jpg",
         title: "Mom took this one",
         comment: "We were trying to look cool. Mom did not make it easy. Still one of my favorites."
     },
     {
-        image: "images/foto4.jpg",
+        image: "images/web/foto4.jpg",
         title: "Church with Gabi",
         comment: "A simple day together, and a really good one."
     },
     {
-        image: "images/foto5.jpg",
+        image: "images/web/foto5.jpg",
         title: "At Gabi’s place",
         comment: "No big plans. Just happy to be there with you."
     },
     {
-        image: "images/foto6.jpg",
+        image: "images/web/foto6.jpg",
         title: "Being silly together",
         comment: "We do not need a reason. We just get each other laughing."
     }
@@ -558,7 +559,6 @@ const memories = [
 const originalMemories = memories.slice();
 const MEMORY_CAROUSEL_LIMIT = 6;
 const GALLERY_PAGE_SIZE = 24;
-const NEWS_PAGE_SIZE = 6;
 
 const littleMomentEntries = Array.from(document.querySelectorAll("#littleMomentEntries [data-image]"), entry => ({
     image: entry.dataset.image,
@@ -621,7 +621,6 @@ window.appSupabaseClient = supabaseClient;
 let uploadedMemories = [];
 let galleryAdminUser = null;
 let galleryAdminIsAllowed = false;
-let r2AdminIsAllowed = false;
 const LITTLE_NOTE_STORAGE_KEY = "loveChronicleLittleNote";
 const LITTLE_NOTE_DEFAULT = "Out of every story, I’d still choose ours.";
 const littleNoteText = document.getElementById("littleNoteText");
@@ -718,10 +717,9 @@ littleNoteForm.addEventListener("submit", async event => {
     littleNoteStatus.textContent = "Saved for both of you.";
 });
 updateLittleNoteAccess();
-let r2AdminToken = (() => { try { return sessionStorage.getItem("loveChronicleR2AdminToken") || ""; } catch (_) { return ""; } })();
 
 /* =========================================
-   CARTINHAS, MAPA E CHECKLIST DO CASAL
+   CARTINHAS E CHECKLIST DO CASAL
 ========================================= */
 
 const plansStorageKeys = {
@@ -1589,79 +1587,6 @@ function sortGalleryItems(items) {
         }).map(entry => entry.item);
 }
 
-function mediaApiBase() {
-    return String(window.CLOUDFLARE_MEDIA_API || "").trim().replace(/\/+$/, "");
-}
-
-async function mediaApi(path, options = {}) {
-    const base = mediaApiBase();
-    if (!base) throw new Error("Configure a URL do Cloudflare Worker em cloudflare-config.js.");
-    const headers = new Headers(options.headers || {});
-    if (r2AdminToken) headers.set("Authorization", `Bearer ${r2AdminToken}`);
-    const response = await fetch(`${base}${path}`, { ...options, headers });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || `O serviço de mídia respondeu ${response.status}.`);
-    return result;
-}
-
-function updateR2AdminUI() {
-    const password = document.getElementById("r2AdminPassword");
-    const loginButton = document.getElementById("r2AdminLoginButton");
-    const logoutButton = document.getElementById("r2AdminLogoutButton");
-    const status = document.getElementById("r2AdminStatus");
-    password.hidden = r2AdminIsAllowed;
-    loginButton.hidden = r2AdminIsAllowed;
-    logoutButton.hidden = !r2AdminIsAllowed;
-    if (!mediaApiBase()) status.textContent = "Falta configurar a URL do Worker para ativar o envio ao Cloudflare R2.";
-    else if (r2AdminIsAllowed) status.textContent = "Acesso da galeria liberado neste aparelho.";
-    document.querySelectorAll(".gallery-delete-button").forEach(button => { button.hidden = !r2AdminIsAllowed; });
-}
-
-async function loginR2Admin() {
-    const status = document.getElementById("r2AdminStatus");
-    const password = document.getElementById("r2AdminPassword").value;
-    if (!password) { status.textContent = "Digite a senha de administração da galeria."; return; }
-    try {
-        const result = await mediaApi("/api/admin/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ password })
-        });
-        r2AdminToken = result.token;
-        sessionStorage.setItem("loveChronicleR2AdminToken", r2AdminToken);
-        r2AdminIsAllowed = true;
-        document.getElementById("r2AdminPassword").value = "";
-        updateR2AdminUI();
-        status.textContent = "Acesso da galeria liberado neste aparelho.";
-    } catch (error) {
-        console.error("Não foi possível entrar no Cloudflare Worker.", error);
-        status.textContent = error.message || "Não foi possível entrar. Confira a senha e a configuração do Worker.";
-    }
-}
-
-function logoutR2Admin() {
-    r2AdminToken = "";
-    r2AdminIsAllowed = false;
-    try { sessionStorage.removeItem("loveChronicleR2AdminToken"); } catch (_) {}
-    updateR2AdminUI();
-    document.getElementById("r2AdminStatus").textContent = "Você saiu da administração da galeria.";
-}
-
-async function refreshR2AdminSession() {
-    if (!r2AdminToken || !mediaApiBase()) { updateR2AdminUI(); return; }
-    try {
-        await mediaApi("/api/admin/session");
-        r2AdminIsAllowed = true;
-    } catch (_) {
-        logoutR2Admin();
-    }
-    updateR2AdminUI();
-}
-
-document.getElementById("r2AdminLoginButton").addEventListener("click", loginR2Admin);
-document.getElementById("r2AdminPassword").addEventListener("keydown", event => { if (event.key === "Enter") loginR2Admin(); });
-document.getElementById("r2AdminLogoutButton").addEventListener("click", logoutR2Admin);
-
 function addGalleryItem(memory) {
     const item = document.createElement("div");
     item.className = "gallery-item";
@@ -1692,7 +1617,7 @@ function addGalleryItem(memory) {
         deleteButton.textContent = "×";
         deleteButton.setAttribute("aria-label", `Apagar ${memory.title || "foto da galeria"}`);
         deleteButton.title = "Apagar esta lembrança";
-        deleteButton.hidden = !r2AdminIsAllowed;
+        deleteButton.hidden = !galleryAdminIsAllowed;
         deleteButton.addEventListener("click", () => deleteGalleryMemory(memory.id));
         item.appendChild(deleteButton);
     }
@@ -1719,7 +1644,7 @@ function updateGalleryAdminUI() {
         message.textContent = "Entre como ADM para organizar as fotos de vocês.";
     }
     document.querySelectorAll(".gallery-delete-button").forEach(button => {
-        button.hidden = !r2AdminIsAllowed;
+        button.hidden = !galleryAdminIsAllowed;
     });
 }
 
@@ -1733,8 +1658,8 @@ async function refreshGalleryAdminPermission() {
     if (!galleryAdminIsAllowed) planData.capsules.forEach(capsule => { delete capsule.message; });
     updateGalleryAdminUI();
     await loadLittleNote();
-    renderNews();
     await loadCouplePlans();
+    await loadGameContentFromCloud();
 }
 
 async function loginGalleryAdmin() {
@@ -1764,7 +1689,6 @@ async function loginGalleryAdmin() {
 }
 
 async function logoutGalleryAdmin() {
-    if (window.stopCoupleLocationSharing) await window.stopCoupleLocationSharing({ silent: true });
     const { error } = await supabaseClient.auth.signOut();
     if (error) {
         document.getElementById("galleryAdminStatus").textContent = "Não foi possível sair da conta. bugou";
@@ -1778,21 +1702,21 @@ async function logoutGalleryAdmin() {
 }
 
 async function deleteGalleryMemory(memoryId) {
-    if (!r2AdminIsAllowed) return;
+    if (!galleryAdminIsAllowed || !supabaseClient) return;
     const memory = uploadedMemories.find(item => item.id === memoryId);
     if (!memory) return;
     const confirmed = window.confirm(`Apagar “${memory.title || memory.comment || "esta foto"}” da galeria? Essa ação não pode ser desfeita.`);
     if (!confirmed) return;
 
-    const status = document.getElementById("r2AdminStatus");
+    const status = document.getElementById("uploadStatus");
     status.textContent = "Apagando lembrança…";
-    try {
-        await mediaApi(`/api/memories/${encodeURIComponent(memoryId)}`, { method: "DELETE" });
-    } catch (error) {
-        console.error("Não foi possível apagar a lembrança do R2.", error);
-        status.textContent = error.message || "O Worker não confirmou a exclusão da lembrança.";
+    const { error: rowError } = await supabaseClient.from("couple_memories").delete().eq("id", memoryId);
+    if (rowError) {
+        console.error("Não foi possível apagar a lembrança do Supabase.", rowError);
+        status.textContent = rowError.message || "Não foi possível apagar a lembrança do Supabase.";
         return;
     }
+    const { error: fileError } = await supabaseClient.storage.from("couple-memories").remove([memory.filePath]);
 
     uploadedMemories = uploadedMemories.filter(item => item.id !== memoryId);
     refreshMemoryCarousel();
@@ -1800,8 +1724,9 @@ async function deleteGalleryMemory(memoryId) {
         .find(item => item.dataset.memoryId === memoryId);
     galleryItem?.remove();
     renderGalleryPage(1);
-    status.textContent = "Lembrança apagada do Cloudflare R2.";
-    document.getElementById("uploadStatus").textContent = status.textContent;
+    status.textContent = fileError
+        ? "A lembrança saiu da galeria, mas o arquivo não foi removido do Storage. Confira as permissões do bucket."
+        : "Lembrança apagada do Supabase.";
 }
 
 window.loginGalleryAdmin = loginGalleryAdmin;
@@ -1810,48 +1735,78 @@ window.logoutGalleryAdmin = logoutGalleryAdmin;
 renderGalleryPage(1);
 
 async function loadSavedMemories() {
+    const status = document.getElementById("uploadStatus");
+    document.querySelectorAll(".gallery-item[data-uploaded='true']").forEach(item => item.remove());
+    uploadedMemories = [];
+    if (!supabaseClient || !galleryAdminIsAllowed) {
+        refreshMemoryCarousel();
+        renderGalleryPage(1);
+        if (status && !galleryAdminUser) status.textContent = "Entre na conta de vocês em Settings para ver as lembranças salvas na nuvem.";
+        return;
+    }
     try {
-        const { memories: records } = await mediaApi("/api/memories");
-        const savedMemories = records.map(record => ({
-            id: record.id,
-            image: record.url,
-            title: record.title,
-            comment: record.subtitle,
-            type: record.media_type,
-            category: record.category,
-            filePath: record.file_key,
-            createdAt: record.created_at
-        }));
-        document.querySelectorAll(".gallery-item[data-uploaded='true']").forEach(item => item.remove());
+        const { data: records, error } = await supabaseClient.from("couple_memories")
+            .select("id, title, subtitle, category, media_type, file_path, created_at")
+            .order("created_at", { ascending: false });
+        if (error) throw error;
+        const fileRecords = records || [];
+        let signedUrlByPath = new Map();
+        if (fileRecords.length) {
+            const { data: signedFiles, error: signedError } = await supabaseClient.storage.from("couple-memories")
+                .createSignedUrls(fileRecords.map(record => record.file_path), 60 * 60 * 24 * 7);
+            if (signedError) throw signedError;
+            signedUrlByPath = new Map((signedFiles || []).map(file => [file.path, file.signedUrl]));
+        }
+        const savedMemories = fileRecords.map(record => {
+            const signedUrl = signedUrlByPath.get(record.file_path);
+            if (!signedUrl) throw new Error(`Não foi possível gerar o link de “${record.title || record.file_path}”.`);
+            return {
+                id: record.id,
+                image: signedUrl,
+                title: record.title,
+                comment: record.subtitle,
+                type: record.media_type,
+                category: record.category,
+                filePath: record.file_path,
+                createdAt: record.created_at
+            };
+        });
         savedMemories.forEach(addGalleryItem);
         uploadedMemories = savedMemories.slice().reverse();
         refreshMemoryCarousel();
         renderGalleryPage(1);
+        if (status) status.textContent = "Lembranças carregadas do Supabase.";
     } catch (error) {
-        console.error("Não foi possível carregar as lembranças do Cloudflare R2.", error);
-        document.getElementById("uploadStatus").textContent = error.message || "Não foi possível carregar as lembranças do Cloudflare R2.";
+        console.error("Não foi possível carregar as lembranças do Supabase.", error);
+        if (status) status.textContent = error.message || "Não foi possível carregar as lembranças do Supabase. Confira se o SQL de mídia foi aplicado.";
     }
 }
 
 async function initializeSupabase() {
-    await refreshR2AdminSession();
-    await loadSavedMemories();
     if (!supabaseClient) {
         updateGalleryAdminUI();
+        await loadSavedMemories();
         return;
     }
     const { data, error } = await supabaseClient.auth.getSession();
     if (error) console.error("Não foi possível recuperar a sessão do ADM.", error);
     galleryAdminUser = data?.session?.user || null;
     await refreshGalleryAdminPermission();
+    await loadSavedMemories();
     await loadDateIdeasFromCloud();
     await loadTimelineChapters();
     await loadCouplePlans();
+    await loadPetFromCloud();
     supabaseClient.auth.onAuthStateChange((_event, session) => {
         galleryAdminUser = session?.user || null;
         galleryAdminIsAllowed = false;
         updateGalleryAdminUI();
-        window.setTimeout(() => refreshGalleryAdminPermission(), 0);
+        window.setTimeout(async () => {
+            await refreshGalleryAdminPermission();
+            await loadSavedMemories();
+            await loadCalendarEvents();
+            await loadPetFromCloud();
+        }, 0);
     });
 }
 
@@ -1864,12 +1819,8 @@ async function addMemoryUpload() {
     const categoryInput = document.getElementById("memoryUploadCategory");
     const status = document.getElementById("uploadStatus");
     const file = fileInput.files[0];
-    if (!mediaApiBase()) {
-        status.textContent = "Configure primeiro o Worker do Cloudflare em cloudflare-config.js.";
-        return;
-    }
-    if (!r2AdminIsAllowed) {
-        status.textContent = "Entre na administração da galeria antes de enviar fotos ou vídeos.";
+    if (!supabaseClient || !galleryAdminIsAllowed || !galleryAdminUser) {
+        status.textContent = "Entre na conta de vocês em Settings antes de enviar fotos ou vídeos.";
         return;
     }
     const title = titleInput.value.trim();
@@ -1882,29 +1833,49 @@ async function addMemoryUpload() {
         status.textContent = "Escolha um arquivo de imagem ou vídeo válido, logico.";
         return;
     }
-    if (file.size > 95 * 1024 * 1024) {
-        status.textContent = "O arquivo precisa ter até 95 MB.";
+    if (file.size > 50 * 1024 * 1024) {
+        status.textContent = "O arquivo precisa ter até 50 MB.";
         return;
     }
     const mediaType = file.type.startsWith("video/") ? "video" : "image";
     const uploadButton = document.getElementById("uploadMemoryButton");
     uploadButton.disabled = true;
-    status.textContent = `Enviando ${mediaType === "video" ? "vídeo" : "foto"} para o Cloudflare R2…`;
+    status.textContent = `Enviando ${mediaType === "video" ? "vídeo" : "foto"} para o Supabase…`;
     try {
-        const uploadDetails = new URLSearchParams({ title, subtitle, category: categoryInput.value, filename: file.name });
-        const { memory: inserted } = await mediaApi(`/api/memories?${uploadDetails}`, {
-            method: "POST",
-            headers: { "Content-Type": file.type },
-            body: file
+        const { data: coupleId, error: coupleError } = await supabaseClient.rpc("current_couple_id");
+        if (coupleError || !coupleId) throw coupleError || new Error("A conta ainda não está vinculada ao casal.");
+        const extension = file.name.includes(".") ? file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g, "") : "bin";
+        const filePath = `${coupleId}/${crypto.randomUUID()}.${extension || "bin"}`;
+        const { error: uploadError } = await supabaseClient.storage.from("couple-memories").upload(filePath, file, {
+            contentType: file.type,
+            cacheControl: "3600",
+            upsert: false
         });
+        if (uploadError) throw uploadError;
+        const { data: inserted, error: metadataError } = await supabaseClient.from("couple_memories").insert({
+            couple_id: coupleId,
+            title,
+            subtitle,
+            category: categoryInput.value,
+            media_type: mediaType,
+            file_path: filePath,
+            uploaded_by: galleryAdminUser.id
+        }).select("id, title, subtitle, category, media_type, file_path, created_at").single();
+        if (metadataError) {
+            await supabaseClient.storage.from("couple-memories").remove([filePath]);
+            throw metadataError;
+        }
+        const { data: signed, error: signedError } = await supabaseClient.storage.from("couple-memories")
+            .createSignedUrl(filePath, 60 * 60 * 24 * 7);
+        if (signedError) throw signedError;
         const memory = {
             id: inserted.id,
-            image: inserted.url,
+            image: signed.signedUrl,
             title: inserted.title,
             comment: inserted.subtitle,
             type: inserted.media_type,
             category: inserted.category,
-            filePath: inserted.file_key,
+            filePath: inserted.file_path,
             createdAt: inserted.created_at
         };
         uploadedMemories.unshift(memory);
@@ -1923,11 +1894,11 @@ async function addMemoryUpload() {
         subtitleInput.value = "";
         categoryInput.value = "us";
         status.textContent = subtitle
-            ? `${mediaType === "video" ? "Vídeo" : "Foto"} enviada ao Cloudflare R2 e adicionada ao carrossel de lembranças.`
-            : `${mediaType === "video" ? "Vídeo" : "Foto"} enviada ao Cloudflare R2 e guardada na galeria.`;
+            ? `${mediaType === "video" ? "Vídeo" : "Foto"} enviada ao Supabase e adicionada ao carrossel de lembranças.`
+            : `${mediaType === "video" ? "Vídeo" : "Foto"} enviada ao Supabase e guardada na galeria.`;
     } catch (error) {
-        console.error("Falha ao enviar mídia para o Cloudflare R2.", error);
-        status.textContent = error.message || "Não foi possível enviar. Confira a conexão com o Cloudflare Worker.";
+        console.error("Falha ao enviar mídia para o Supabase.", error);
+        status.textContent = error.message || "Não foi possível enviar. Confira a conexão e as políticas do Supabase.";
     } finally {
         uploadButton.disabled = false;
     }
@@ -1971,6 +1942,8 @@ function openPage(pageName) {
         selectedButton.classList.add("active");
     }
 
+    document.getElementById("storyCat")?.classList.toggle("pet-is-home", pageName === "pet");
+
     window.scrollTo({
         top: 0,
         behavior: "smooth"
@@ -1992,214 +1965,511 @@ navButtons.forEach(button => {
 
 });
 
-
 /* =========================================
-   NOTÍCIAS INICIAIS
+   CALENDÁRIO COMPARTILHADO
 ========================================= */
-
-const starterNews = [
-
-    {
-        date: "14 SEP 2026",
-        title: "CASAL PASSA MAIS UM DIA ESCREVENDO SUA HISTÓRIA",
-        description:
-            "Fontes próximas afirmam que o dia foi marcado por conversas, risadas e mais uma memória para guardar."
-    },
-
-    {
-        date: "13 SEP 2026",
-        title: "MAIS UMA NOITE ENTRA PARA O ARQUIVO",
-        description:
-            "O casal passou mais uma noite juntos, provando que até os momentos mais simples podem virar grandes lembranças."
-    },
-
-    {
-        date: "12 SEP 2026",
-        title: "AMOR CONTINUA SENDO A PRINCIPAL NOTÍCIA",
-        description:
-            "Segundo a nossa redação, não há previsão para o fim dessa história."
-    }
-
+const calendarStorageKey = "loveChronicleCalendarEvents";
+const calendarBuiltIns = [
+    { id: "anniversary", title: "Our anniversary", month: 3, day: 3, type: "anniversary", annual: true },
+    { id: "gabi-birthday", title: "Gabi’s birthday", month: 10, day: 30, type: "birthday", annual: true },
+    { id: "samuel-birthday", title: "Samuel’s birthday", month: 3, day: 17, type: "birthday", annual: true },
+    { id: "fifteenth-party", title: "Gabi’s 15th birthday party", year: 2026, month: 11, day: 13, type: "birthday", annual: false },
+    { id: "christmas", title: "Christmas", month: 11, day: 25, type: "plan", annual: true },
+    { id: "new-year", title: "New Year’s Day", month: 0, day: 1, type: "plan", annual: true },
 ];
-let news = starterNews.slice();
-let editingNewsId = null;
-let newsPage = 1;
-
-
-/* =========================================
-   RENDERIZAR NOTÍCIAS
-========================================= */
-
-function renderNews(page = newsPage) {
-    const homeContainer = document.getElementById("homeNews");
-    const allContainer = document.getElementById("allNews");
-    const pagination = document.getElementById("newsPagination");
-    if (!homeContainer || !allContainer || !pagination) return;
-    homeContainer.replaceChildren();
-    allContainer.replaceChildren();
-
-    const createNewsElement = (item, includeActions) => {
-        const element = document.createElement("article");
-        element.className = "news-item";
-        const date = document.createElement("div");
-        date.className = "news-date";
-        date.textContent = item.date;
-        const content = document.createElement("div");
-        const title = document.createElement("h3");
-        title.textContent = item.title;
-        const description = document.createElement("p");
-        description.textContent = item.description;
-        content.append(title, description);
-        element.append(date, content);
-
-        if (includeActions && item.id && galleryAdminIsAllowed) {
-            const actions = document.createElement("div");
-            actions.className = "news-actions";
-            const editButton = document.createElement("button");
-            editButton.type = "button";
-            editButton.textContent = "EDIT";
-            editButton.addEventListener("click", () => editNews(item.id));
-            const deleteButton = document.createElement("button");
-            deleteButton.type = "button";
-            deleteButton.textContent = "DELETE";
-            deleteButton.addEventListener("click", () => deleteNews(item.id));
-            actions.append(editButton, deleteButton);
-            element.appendChild(actions);
-        }
-        return element;
-    };
-
-    const pageCount = Math.max(1, Math.ceil(news.length / NEWS_PAGE_SIZE));
-    newsPage = Math.min(Math.max(page, 1), pageCount);
-    const visibleNews = news.slice((newsPage - 1) * NEWS_PAGE_SIZE, newsPage * NEWS_PAGE_SIZE);
-    visibleNews.forEach(item => allContainer.appendChild(createNewsElement(item, true)));
-    news.slice(0, 2).forEach(item => homeContainer.appendChild(createNewsElement(item, false)));
-
-    pagination.replaceChildren();
-    for (let number = 1; number <= pageCount; number++) {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = `gallery-page-button${number === newsPage ? " active" : ""}`;
-        button.textContent = number;
-        button.setAttribute("aria-label", `Página ${number} das notícias`);
-        button.setAttribute("aria-current", number === newsPage ? "page" : "false");
-        button.addEventListener("click", () => {
-            renderNews(number);
-            document.getElementById("news").scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-        pagination.appendChild(button);
-    }
+const calendarIcons = { birthday: "🎂", anniversary: "💗", trip: "✈️", plan: "✦" };
+let calendarEvents = (() => { try { return JSON.parse(localStorage.getItem(calendarStorageKey) || "[]"); } catch (_) { return []; } })();
+let calendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let calendarSelectedDay = new Date();
+function calendarDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`; }
+function calendarDateFor(event, year) { return new Date(event.year || year, event.month, event.day); }
+function calendarVisibleEvents(year, month) {
+    const builtIns = calendarBuiltIns.flatMap(event => {
+        const eventDate = calendarDateFor(event, year);
+        if (event.annual && eventDate.getFullYear() !== year) return [];
+        if (!event.annual && event.year !== year) return [];
+        return [{ ...event, date: calendarDateKey(eventDate), locked: true }];
+    });
+    const userEvents = calendarEvents.flatMap(event => {
+        const original = new Date(`${event.event_date}T00:00:00`);
+        if (event.is_annual) original.setFullYear(year);
+        if (original.getFullYear() !== year) return [];
+        return [{ id: event.id, title: event.title, date: calendarDateKey(original), type: event.type || "plan", note: event.note || "", locked: false }];
+    });
+    return [...builtIns, ...userEvents].filter(event => Number(event.date.slice(5,7)) === month + 1);
 }
-
-renderNews();
-
+function renderCalendar() {
+    const daysNode = document.getElementById("calendarDays");
+    if (!daysNode) return;
+    const year = calendarCursor.getFullYear(), month = calendarCursor.getMonth();
+    document.getElementById("calendarMonthTitle").textContent = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(calendarCursor);
+    const events = calendarVisibleEvents(year, month);
+    daysNode.replaceChildren();
+    const firstWeekday = (new Date(year, month, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const previousDays = new Date(year, month, 0).getDate();
+    const todayKey = calendarDateKey(new Date());
+    for (let index = 0; index < 42; index++) {
+        const offset = index - firstWeekday + 1;
+        const inMonth = offset >= 1 && offset <= daysInMonth;
+        const number = offset < 1 ? previousDays + offset : offset > daysInMonth ? offset - daysInMonth : offset;
+        const cellDate = new Date(year, month + (offset < 1 ? -1 : offset > daysInMonth ? 1 : 0), number);
+        const key = calendarDateKey(cellDate);
+        const dayEvents = events.filter(event => event.date === key);
+        const cell = document.createElement("button");
+        cell.type = "button"; cell.className = "calendar-day";
+        cell.setAttribute("role", "gridcell"); cell.setAttribute("aria-label", `${new Intl.DateTimeFormat("en", { dateStyle: "full" }).format(cellDate)}${dayEvents.length ? `, ${dayEvents.length} event${dayEvents.length > 1 ? "s" : ""}` : ""}`);
+        if (!inMonth) cell.classList.add("outside-month");
+        if (key === todayKey) cell.classList.add("today");
+        if (key === calendarDateKey(calendarSelectedDay)) cell.classList.add("selected");
+        cell.append(document.createTextNode(String(number)));
+        if (dayEvents.length) { const marks = document.createElement("span"); marks.className = "calendar-day-marks"; marks.setAttribute("aria-hidden", "true"); dayEvents.slice(0,3).forEach(event => { const mark = document.createElement("i"); mark.className = `event-${event.type}`; marks.append(mark); }); cell.append(marks); }
+        cell.addEventListener("click", () => { calendarSelectedDay = cellDate; renderCalendar(); });
+        daysNode.append(cell);
+    }
+    renderCalendarUpcoming();
+}
+function calendarAllEvents() {
+    const year = new Date().getFullYear();
+    const result = [...calendarBuiltIns.flatMap(event => {
+        const date = calendarDateFor(event, year);
+        if (!event.annual && event.year !== year) return [];
+        const nextDate = new Date(date);
+        if (event.annual && nextDate < new Date(new Date().setHours(0,0,0,0))) nextDate.setFullYear(year + 1);
+        return [{ ...event, date: calendarDateKey(nextDate), locked: true }];
+    }), ...calendarEvents.map(event => {
+        const date = new Date(`${event.event_date}T00:00:00`);
+        if (event.is_annual) {
+            date.setFullYear(year);
+            if (date < new Date(new Date().setHours(0,0,0,0))) date.setFullYear(year + 1);
+        }
+        return { id: event.id, title: event.title, date: calendarDateKey(date), type: event.type || "plan", note: event.note || "", locked: false, annual: event.is_annual };
+    })];
+    return result.filter(event => event.date >= calendarDateKey(new Date())).sort((a,b) => a.date.localeCompare(b.date));
+}
+let calendarShowAll = false;
+function renderCalendarUpcoming() {
+    const list = document.getElementById("calendarUpcoming");
+    if (!list) return;
+    list.replaceChildren();
+    const items = calendarAllEvents().slice(0, calendarShowAll ? 30 : 5);
+    if (!items.length) { const empty = document.createElement("p"); empty.className = "calendar-empty"; empty.textContent = "No plans yet. Add one you’re looking forward to."; list.append(empty); return; }
+    const today = new Date(); today.setHours(0,0,0,0);
+    items.forEach(event => {
+        const row = document.createElement("article"); row.className = "calendar-event-row";
+        const icon = document.createElement("span"); icon.className = `calendar-event-icon event-${event.type}`; icon.textContent = calendarIcons[event.type] || "✦";
+        const body = document.createElement("div"); body.className = "calendar-event-copy";
+        const title = document.createElement("strong"); title.textContent = event.title;
+        const date = new Date(`${event.date}T00:00:00`);
+        const subtitle = document.createElement("small"); subtitle.textContent = `${new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(date)}${event.annual ? " · every year" : ""}${event.note ? ` · ${event.note}` : ""}`;
+        const days = document.createElement("span"); days.className = "calendar-days-left"; const distance = Math.round((date-today)/86400000); days.textContent = distance === 0 ? "Today" : distance === 1 ? "Tomorrow" : `in ${distance} days`;
+        body.append(title, subtitle); row.append(icon, body, days);
+        if (!event.locked) { const remove = document.createElement("button"); remove.type = "button"; remove.className = "calendar-delete"; remove.textContent = "×"; remove.setAttribute("aria-label", `Delete ${event.title}`); remove.addEventListener("click", () => deleteCalendarEvent(event.id)); row.append(remove); }
+        list.append(row);
+    });
+}
+function saveCalendarLocally() { try { localStorage.setItem(calendarStorageKey, JSON.stringify(calendarEvents)); } catch (_) {} }
+async function loadCalendarEvents() {
+    if (!supabaseClient) { renderCalendar(); return; }
+    const { data, error } = await supabaseClient.from("couple_calendar_events").select("id,title,event_date,type,note,is_annual").order("event_date");
+    if (!error && data && (data.length || !calendarEvents.length)) { calendarEvents = data; saveCalendarLocally(); }
+    else if (error && !/couple_calendar_events/.test(error.message || "")) console.warn("Could not load couple calendar", error);
+    renderCalendar();
+}
+async function deleteCalendarEvent(id) {
+    calendarEvents = calendarEvents.filter(event => event.id !== id); saveCalendarLocally(); renderCalendar();
+    if (supabaseClient) { const { error } = await supabaseClient.from("couple_calendar_events").delete().eq("id", id); if (error) document.getElementById("calendarStatus").textContent = "Removed here. Run the calendar SQL in Supabase to sync changes between phones."; else document.getElementById("calendarStatus").textContent = "Event removed."; }
+}
+const calendarDialog = document.getElementById("calendarEventDialog");
+document.getElementById("calendarAddButton").addEventListener("click", () => { document.getElementById("calendarEventDate").value = calendarDateKey(calendarSelectedDay); calendarDialog.showModal(); });
+document.getElementById("calendarDialogClose").addEventListener("click", () => calendarDialog.close());
+document.getElementById("calendarPrev").addEventListener("click", () => { calendarCursor.setMonth(calendarCursor.getMonth()-1); renderCalendar(); });
+document.getElementById("calendarNext").addEventListener("click", () => { calendarCursor.setMonth(calendarCursor.getMonth()+1); renderCalendar(); });
+document.getElementById("calendarViewAll").addEventListener("click", event => { calendarShowAll = !calendarShowAll; event.currentTarget.textContent = calendarShowAll ? "Show less" : "View all"; renderCalendarUpcoming(); });
+document.getElementById("calendarEventForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const record = { id: globalThis.crypto?.randomUUID?.() || `event-${Date.now()}-${Math.random().toString(36).slice(2)}`, title: document.getElementById("calendarEventTitle").value.trim(), event_date: document.getElementById("calendarEventDate").value, type: document.getElementById("calendarEventType").value, is_annual: document.getElementById("calendarEventAnnual").checked, note: document.getElementById("calendarEventNote").value.trim() };
+    if (!record.title || !record.event_date) return;
+    calendarEvents.push(record); saveCalendarLocally(); renderCalendar(); calendarDialog.close(); event.currentTarget.reset();
+    if (supabaseClient) { const { error } = await supabaseClient.from("couple_calendar_events").insert(record); document.getElementById("calendarStatus").textContent = error ? "Saved on this device. Run the calendar SQL in Supabase to sync between phones." : "Saved for both of you."; }
+    else document.getElementById("calendarStatus").textContent = "Saved on this device.";
+});
+renderCalendar();
+loadCalendarEvents();
 
 /* =========================================
-   ADICIONAR NOTÍCIA
+   JOGOS RÁPIDOS PARA O CASAL
 ========================================= */
-
-async function addNews() {
-    const title = document.getElementById("newsTitle").value.trim();
-    const description = document.getElementById("newsDescription").value.trim();
-    const status = document.getElementById("newsStatus");
-    const saveButton = document.getElementById("saveNewsButton");
-    if (!title || !description) {
-        status.textContent = "Preencha o título e a descrição da notícia.";
-        return;
+const coupleGames = {
+    question: { title: "Uma pergunta pra puxar conversa", kind: "answer", prompts: [
+        "Que coisinha simples sempre melhora seu dia?", "Qual lembrança nossa te faz sorrir na hora?", "Que lugar você quer muito conhecer comigo?", "O que eu faço que sempre te deixa acolhida(o)?", "Qual seria nosso domingo perfeito?", "Que música combina com a nossa história?", "Qual foi seu primeiro pensamento quando me conheceu?", "Que comida você escolheria para a gente fazer junto?", "O que você quer que a gente continue fazendo mesmo daqui a muitos anos?", "Qual aventura pequena a gente devia viver esse mês?", "O que você aprendeu sobre você desde que estamos juntos?", "Qual foto nossa merece virar um quadro?", "Qual mania minha você acha engraçada?", "Que tradição só nossa seria legal começar?", "Qual foi um momento em que você se sentiu muito amado(a) por mim?", "Se hoje fosse um capítulo da nossa história, qual seria o título?", "Que talento secreto você acha que eu devia descobrir?", "O que faz um dia comum virar um dia especial pra você?"] },
+    likely: { title: "Quem faria isso primeiro?", kind: "vote", options: ["Samuel", "Gabi", "Os dois"], prompts: [
+        "…rir numa hora em que todo mundo está sério?", "…esquecer onde deixou o celular?", "…propor uma viagem de última hora?", "…escolher o filme e dormir antes do final?", "…fazer amizade com um bichinho na rua?", "…pedir sobremesa mesmo já estando cheio(a)?", "…começar uma guerra de cócegas?", "…guardar uma lembrancinha pequena por anos?", "…cantar alto sem saber a letra?", "…planejar uma surpresa romântica?", "…se perder mesmo com o mapa aberto?", "…mandar mensagem dizendo ‘saudade’ primeiro?"] },
+    quiz: { title: "Quiz: quanto vocês lembram?", kind: "quiz", prompts: [
+        { text: "Em que dia começou o nosso namoro?", options: ["3 de abril de 2026", "3 de maio de 2026", "13 de abril de 2026", "17 de abril de 2026"], answer: 0 },
+        { text: "Em que mês é o aniversário da Gabi?", options: ["Setembro", "Novembro", "Dezembro", "Abril"], answer: 1 },
+        { text: "Qual é o dia do aniversário do Samuel?", options: ["3 de abril", "30 de novembro", "17 de abril", "13 de dezembro"], answer: 2 },
+        { text: "Em que dia será a festa de 15 anos da Gabi?", options: ["30 de novembro de 2026", "3 de abril de 2026", "17 de abril de 2026", "13 de dezembro de 2026"], answer: 3 },
+        { text: "Qual é o nosso dia de namoro?", options: ["Todo dia 3 de abril", "Todo dia 17 de abril", "Todo dia 30 de novembro", "Todo dia 13 de dezembro"], answer: 0 }
+    ] },
+    "would-you": { title: "Você prefere?", kind: "vote", options: [], prompts: [
+        { text: "Um fim de semana na praia ou numa cabana na serra?", options: ["Pé na areia", "Friozinho na serra"] },
+        { text: "Jantar feito em casa ou conhecer um restaurante novo?", options: ["Cozinhar juntinhos", "Explorar um lugar novo"] },
+        { text: "Ver o nascer do sol ou assistir ao pôr do sol?", options: ["Acordar cedinho", "Esperar o céu ficar dourado"] },
+        { text: "Uma viagem surpresa ou planejar cada detalhe juntos?", options: ["Surpresa!", "Roteiro completinho"] },
+        { text: "Noite de jogos ou maratona de filmes?", options: ["Competição divertida", "Cobertor e filme"] },
+        { text: "Piquenique no parque ou café numa padaria charmosa?", options: ["Piquenique", "Café gostoso"] },
+        { text: "Receber uma carta à mão ou uma playlist feita pra você?", options: ["Cartinha", "Playlist"] },
+        { text: "Passeio sem destino ou dia planejado com carinho?", options: ["Vamos ver onde dá", "Cada detalhe pensado"] },
+        { text: "Adotar um bichinho ou encher a casa de plantas?", options: ["Mais um companheirinho", "Uma mini floresta"] },
+        { text: "Recriar nosso primeiro encontro ou inventar um encontro novo?", options: ["Voltar no começo", "Criar uma lembrança nova"] }
+    ] },
+    challenge: { title: "Desafio fofo pra fazer agora", kind: "challenge", prompts: [
+        "Façam um elogio que ainda não disseram um ao outro hoje.", "Escolham uma foto antiga e contem o que lembram daquele dia.", "Dancem juntos uma música inteira, mesmo sem saber os passos.", "Planejem um encontro gastando quase nada.", "Cada um desenha o outro em 30 segundos. Sem apagar!", "Mandem uma mensagem carinhosa como se estivessem no começo do namoro.", "Escolham juntos uma música para a trilha sonora de vocês.", "Façam um abraço de 20 segundos sem olhar o celular.", "Contem três coisas pequenas que admiram um no outro.", "Tirem uma foto imitando uma lembrança antiga.", "Escolham uma receita nova para fazer juntos esta semana.", "Inventem um nome e uma história para um bichinho que virem por aí."] }
+};
+coupleGames.question.prompts.push(
+    "Qual detalhe meu você percebe antes de todo mundo?", "O que você gostaria que a gente aprendesse junto?", "Qual seria o nome do nosso café se abríssemos um?", "Que cheiro te lembra um momento bom nosso?", "Qual passeio simples você repetiria mil vezes?", "O que você acha que fazemos melhor como dupla?", "Que coisa nova você toparia experimentar comigo?", "Qual apelido secreto combina comigo?", "Quando você sente mais saudade de mim?", "O que te faz sentir em casa quando estamos juntos?", "Qual foi a surpresa mais gostosa que já recebeu?", "Se tivéssemos um dia sem compromissos, como ele começaria?", "Qual filme ou série queria esquecer só pra ver comigo de novo?", "O que você quer guardar numa cápsula do tempo nossa?", "Qual coisa boba sempre consegue te fazer rir?", "O que você quer fazer comigo antes do fim do ano?", "Em que momento percebeu que gostava mesmo de mim?", "Qual seria nosso passeio perfeito num dia de chuva?", "O que você acha fofo e nunca me contou?", "Que plano nosso te deixa mais animado(a)?", "Qual sobremesa combina com a nossa história?", "Qual conversa nossa ficou na sua cabeça?", "O que você gostaria que eu perguntasse mais vezes?", "Qual lembrança você quer criar comigo no próximo mês?", "Que pequena gentileza faz diferença no seu dia?", "Como descreveria a gente em três palavras?", "Qual seria nosso ritual de bom-dia ideal?", "Que lugar da cidade deveria virar nosso cantinho?", "O que você mais gosta quando a gente fica sem fazer nada?"
+);
+coupleGames.likely.prompts.push(
+    "…rir primeiro numa discussão boba?", "…adotar mais um bichinho por impulso?", "…escolher a sobremesa dos dois?", "…tirar 30 fotos da mesma pose?", "…fazer amizade com a família inteira em cinco minutos?", "…cantar no carro como se estivesse num show?", "…lembrar de uma data importante sem alarme?", "…comprar um presente só porque viu e lembrou do outro?", "…se emocionar com um vídeo fofo?", "…querer ficar mais cinco minutinhos abraçado?", "…inventar uma receita estranha e gostar dela?", "…organizar a próxima viagem?", "…dançar na cozinha enquanto espera a comida?", "…mandar o primeiro meme do dia?", "…fazer carinho no gato e esquecer o que ia fazer?", "…dormir no meio do filme?", "…guardar um bilhetinho por anos?", "…pedir para tirar uma foto juntos?"
+);
+coupleGames.quiz.prompts.push(
+    { text: "Qual é o dia da festa de 15 anos da Gabi?", options: ["13 de dezembro", "30 de novembro", "17 de abril", "3 de abril"], answer: 0 },
+    { text: "Em qual mês fazemos aniversário de namoro?", options: ["Abril", "Novembro", "Dezembro", "Maio"], answer: 0 },
+    { text: "Que dia é o aniversário do Samuel?", options: ["17 de abril", "13 de dezembro", "30 de novembro", "3 de maio"], answer: 0 },
+    { text: "Qual dia é o aniversário da Gabi?", options: ["30 de novembro", "17 de abril", "13 de dezembro", "3 de abril"], answer: 0 },
+    { text: "Quando é a festa de 15 anos da Gabi?", options: ["13 de dezembro de 2026", "17 de abril de 2026", "30 de novembro de 2026", "3 de abril de 2026"], answer: 0 },
+    { text: "Qual destas combina com uma noite gostosa a dois?", options: ["Filme e cobertor", "Reunião de trabalho", "Arrumar imposto", "Ficar sem se falar"], answer: 0 },
+    { text: "Qual é uma boa ideia para um date simples?", options: ["Escolher algo juntos", "Competir pra ver quem fica no celular", "Não conversar", "Deixar tudo pra depois"], answer: 0 },
+    { text: "O que vale mais guardar por aqui?", options: ["As lembranças de vocês", "Só tarefas do trabalho", "Placar de campeonato", "Previsão de trânsito"], answer: 0 },
+    { text: "Qual destas datas é do Samuel?", options: ["17 de abril", "30 de novembro", "13 de dezembro", "3 de abril"], answer: 0 },
+    { text: "Qual destas datas é da Gabi?", options: ["30 de novembro", "17 de abril", "13 de dezembro", "3 de abril"], answer: 0 }
+);
+coupleGames["would-you"].prompts.push(
+    { text: "Café da manhã na cama ou jantar à luz de velas?", options: ["Começar o dia devagar", "Fechar o dia juntinhos"] },
+    { text: "Ganhar uma cartinha ou uma playlist feita pra você?", options: ["Palavras guardadas", "Músicas com significado"] },
+    { text: "Fazer uma viagem surpresa ou escolher cada parada juntos?", options: ["Pode me surpreender", "Quero montar o roteiro"] },
+    { text: "Piquenique no parque ou lanche no carro vendo a chuva?", options: ["Sol e grama", "Chuva e conversa"] },
+    { text: "Cozinhar algo novo ou pedir nossa comida favorita?", options: ["Aventura na cozinha", "Clássico que nunca falha"] },
+    { text: "Rever fotos antigas ou tirar fotos novas hoje?", options: ["Bateu saudade", "Vamos criar mais"] },
+    { text: "Um date planejado ou um convite de última hora?", options: ["Adoro um plano", "Bora agora"] },
+    { text: "Abraço demorado ou beijo roubado?", options: ["Fica mais um pouco", "Me pegou de surpresa"] },
+    { text: "Dia inteiro juntos ou uma ligação surpresa no meio do dia?", options: ["Quero você por perto", "Saudade com surpresa"] },
+    { text: "Montanha com friozinho ou praia com pé na areia?", options: ["Cobertor e serra", "Sol e mar"] }
+);
+coupleGames.challenge.prompts.push(
+    "Cada um escolhe uma música que lembra o outro e explica o motivo.", "Façam um mini piquenique com o que já tem em casa.", "Contem uma coisa que querem aprender juntos.", "Tirem uma foto engraçada sem combinar a pose.", "Mandem um áudio dizendo uma lembrança favorita de vocês.", "Escolham um lugar perto onde nunca foram e planejem visitar.", "Façam um desenho um do outro de olhos fechados.", "Cada um escolhe um doce para o outro provar.", "Criem um aperto de mão secreto em cinco passos.", "Escrevam um bilhete fofo e escondam para o outro achar.", "Assistam juntos a um vídeo antigo e contem um detalhe novo.", "Inventem um nome para o próximo capítulo da história de vocês."
+);
+const gameProgressKey = "loveChronicleGameProgress";
+const gameContentKey = "loveChronicleGameContent";
+const editableGameKeys = ["question", "likely", "quiz", "would-you", "challenge"];
+const editableGameNames = { question: "Perguntas", likely: "Quem faria?", quiz: "Quiz do casal", "would-you": "Você prefere?", challenge: "Desafios" };
+function copyGameContent() { return Object.fromEntries(editableGameKeys.map(key => [key, { prompts: coupleGames[key].prompts, ...(coupleGames[key].options ? { options: coupleGames[key].options } : {}) }])); }
+function applyGameContent(content) {
+    if (!content || typeof content !== "object") return false;
+    for (const key of editableGameKeys) {
+        const source = content[key];
+        if (!source || !Array.isArray(source.prompts)) continue;
+        coupleGames[key].prompts = source.prompts.filter(item => typeof item === "string" || (item && typeof item.text === "string" && Array.isArray(item.options)));
+        if (Array.isArray(source.options) && source.options.length) coupleGames[key].options = source.options.slice(0, 8);
     }
-    if (!supabaseClient) {
-        status.textContent = "O Supabase não está disponível (-_-). Confira a configuração do site.";
-        return;
-    }
-
-    saveButton.disabled = true;
-    status.textContent = editingNewsId ? "Salvando alterações…" : "Publicando notícia…";
+    return true;
+}
+let hasLocalGameContent = false;
+try { const saved = localStorage.getItem(gameContentKey); if (saved) hasLocalGameContent = applyGameContent(JSON.parse(saved)); } catch (_) {}
+function persistGameContent(message = "Alterações salvas neste aparelho.") {
+    localStorage.setItem(gameContentKey, JSON.stringify(copyGameContent()));
+    const status = document.getElementById("questionEditorStatus");
+    if (status) status.textContent = message;
+    saveGameContentToCloud();
+}
+async function loadGameContentFromCloud() {
+    if (!supabaseClient || !galleryAdminIsAllowed) return;
     try {
-        const query = editingNewsId
-            ? supabaseClient.from("daily_news").update({ title, description }).eq("id", editingNewsId)
-            : supabaseClient.from("daily_news").insert({ title, description });
-        const { data, error } = await query
-            .select("id, title, description, published_on, created_at")
-            .single();
+        const { data: coupleId, error: coupleError } = await supabaseClient.rpc("current_couple_id");
+        if (coupleError || !coupleId) return;
+        const { data, error } = await supabaseClient.from("couple_game_settings").select("game_content").eq("couple_id", coupleId).maybeSingle();
         if (error) throw error;
-        const savedItem = mapSavedNews(data);
-        if (editingNewsId) news = news.map(item => item.id === editingNewsId ? savedItem : item);
-        else {
-            news.unshift(savedItem);
-            newsPage = 1;
-        }
-        const wasEditing = Boolean(editingNewsId);
-        cancelNewsEdit();
-        renderNews();
-        status.textContent = wasEditing ? "Notícia atualizada e salva." : "Notícia publicada e salva para todos.";
-    } catch (error) {
-        console.error("Não foi possível salvar a notícia.", error);
-        status.textContent = "Não foi possível salvar, deve ser a conexão bb. Confira sua conexão e execute o SQL atualizado do Supabase.";
-    } finally {
-        saveButton.disabled = false;
+        if (data?.game_content) {
+            applyGameContent(data.game_content);
+            localStorage.setItem(gameContentKey, JSON.stringify(copyGameContent()));
+            hasLocalGameContent = true;
+            renderGame(); renderQuestionManager();
+            const status = document.getElementById("questionEditorStatus"); if (status) status.textContent = "Perguntas sincronizadas com a conta de vocês.";
+        } else if (hasLocalGameContent) await saveGameContentToCloud();
+    } catch (error) { console.warn("Questions remain saved locally; run the game setup SQL to sync them.", error); }
+}
+async function saveGameContentToCloud() {
+    if (!supabaseClient || !galleryAdminIsAllowed) return;
+    try {
+        const { data: coupleId, error: coupleError } = await supabaseClient.rpc("current_couple_id");
+        if (coupleError || !coupleId) return;
+        const { error } = await supabaseClient.from("couple_game_settings").upsert({ couple_id: coupleId, game_content: copyGameContent(), updated_at: new Date().toISOString() }, { onConflict: "couple_id" });
+        if (error) throw error;
+        const status = document.getElementById("questionEditorStatus"); if (status) status.textContent = "Salvo e sincronizado com a conta de vocês.";
+    } catch (error) { console.warn("Could not sync game questions", error); const status = document.getElementById("questionEditorStatus"); if (status) status.textContent = "Salvo neste aparelho. Para sincronizar, aplique o SQL de jogos no Supabase."; }
+}
+let editingPromptIndex = null;
+function promptToEditorText(item) { return typeof item === "string" ? item : item.text; }
+function renderQuestionManager() {
+    const select = document.getElementById("questionGameSelect"), list = document.getElementById("questionEditorList");
+    if (!select || !list) return;
+    const key = select.value, game = coupleGames[key];
+    document.getElementById("questionOptionsField").hidden = key === "question" || key === "challenge";
+    document.getElementById("questionAnswerField").hidden = key !== "quiz";
+    const sharedOptions = key === "likely" ? game.options : null;
+    list.replaceChildren();
+    game.prompts.forEach((item, index) => {
+        const row = document.createElement("div"); row.className = "question-editor-row";
+        const copy = document.createElement("span"); copy.textContent = `${index + 1}. ${promptToEditorText(item)}`;
+        const actions = document.createElement("div"); actions.className = "question-editor-buttons";
+        const edit = document.createElement("button"); edit.type = "button"; edit.textContent = "Editar"; edit.addEventListener("click", () => {
+            editingPromptIndex = index; document.getElementById("questionPromptInput").value = promptToEditorText(item);
+            document.getElementById("questionOptionsInput").value = key === "likely" ? game.options.join("\n") : (item && typeof item === "object" ? item.options.join("\n") : "");
+            document.getElementById("questionAnswerInput").value = item && typeof item === "object" ? item.answer + 1 : 1;
+            document.getElementById("questionSaveButton").textContent = "Salvar edição"; document.getElementById("questionCancelButton").hidden = false;
+            document.getElementById("questionPromptInput").focus();
+        });
+        const remove = document.createElement("button"); remove.type = "button"; remove.textContent = "Apagar"; remove.setAttribute("aria-label", `Apagar: ${promptToEditorText(item)}`); remove.addEventListener("click", () => {
+            if (!window.confirm("Apagar esta pergunta da brincadeira?")) return;
+            game.prompts.splice(index, 1); gameProgress[key] = { ...(gameProgress[key] || {}), index: Math.min(gameProgress[key]?.index || 0, Math.max(game.prompts.length - 1, 0)), answers: {}, score: 0 };
+            localStorage.setItem(gameProgressKey, JSON.stringify(gameProgress)); finishQuestionEdit(); persistGameContent(); renderGame(); renderQuestionManager();
+        });
+        actions.append(edit, remove); row.append(copy, actions); list.append(row);
+    });
+    if (sharedOptions && !game.prompts.length) list.textContent = "Ainda não tem perguntas. Adicione a primeira acima.";
+}
+function finishQuestionEdit() { const select = document.getElementById("questionGameSelect"), selectedGame = select.value; editingPromptIndex = null; document.getElementById("questionEditorForm").reset(); select.value = selectedGame; document.getElementById("questionAnswerInput").value = "1"; document.getElementById("questionSaveButton").textContent = "Adicionar pergunta"; document.getElementById("questionCancelButton").hidden = true; }
+document.getElementById("questionGameSelect")?.addEventListener("change", () => { finishQuestionEdit(); renderQuestionManager(); });
+document.getElementById("questionCancelButton")?.addEventListener("click", finishQuestionEdit);
+document.getElementById("questionEditorForm")?.addEventListener("submit", event => {
+    event.preventDefault();
+    const key = document.getElementById("questionGameSelect").value, game = coupleGames[key], text = document.getElementById("questionPromptInput").value.trim();
+    const options = document.getElementById("questionOptionsInput").value.split(/\n+/).map(option => option.trim()).filter(Boolean).slice(0, 8);
+    if (["quiz", "would-you"].includes(key) && options.length < 2) { document.getElementById("questionEditorStatus").textContent = "Coloque pelo menos duas opções, uma por linha."; return; }
+    let entry = text;
+    if (["quiz", "would-you"].includes(key)) entry = { text, options, ...(key === "quiz" ? { answer: Math.max(0, Math.min(options.length - 1, Number(document.getElementById("questionAnswerInput").value || 1) - 1)) } : {}) };
+    if (key === "likely" && options.length >= 2) game.options = options;
+    if (editingPromptIndex === null) game.prompts.push(entry); else game.prompts[editingPromptIndex] = entry;
+    const state = gameProgress[key] || { index: 0, answers: {}, score: 0 }; state.index = Math.min(state.index || 0, game.prompts.length - 1); state.answers = {}; state.score = 0; gameProgress[key] = state;
+    localStorage.setItem(gameProgressKey, JSON.stringify(gameProgress)); finishQuestionEdit(); persistGameContent(); renderGame(); renderQuestionManager();
+});
+renderQuestionManager();
+let gameProgress = {}; try { gameProgress = JSON.parse(localStorage.getItem(gameProgressKey) || "{}"); } catch (_) {}
+let activeGame = "question";
+function renderGame() {
+    const game = coupleGames[activeGame], panel = document.getElementById("gamePanel"); if (!game || !panel) return;
+    panel.setAttribute("aria-labelledby", `gameTab-${activeGame}`);
+    panel.replaceChildren();
+    const saved = gameProgress[activeGame] || { index: 0, answers: {}, score: 0 };
+    if (!Number.isInteger(saved.index)) saved.index = 0;
+    if (!saved.answers || typeof saved.answers !== "object") saved.answers = {};
+    const prompts = game.prompts;
+    if (!prompts.length) {
+        const label = document.createElement("span"); label.className = "section-label"; label.textContent = editableGameNames[activeGame];
+        const title = document.createElement("h3"); title.textContent = game.title;
+        const empty = document.createElement("p"); empty.className = "game-prompt"; empty.textContent = "Essa brincadeira está sem perguntas. Abra ‘Montar nossas perguntas’ aqui embaixo para criar uma.";
+        panel.append(label, title, empty); return;
     }
+    const index = Math.min(saved.index || 0, prompts.length - 1);
+    const item = prompts[index];
+    const promptText = typeof item === "string" ? item : item.text;
+    const label = document.createElement("span"); label.className = "section-label"; label.textContent = activeGame === "question" ? "PERGUNTA PRA HOJE" : "SÓ VOCÊS DOIS";
+    const title = document.createElement("h3"); title.textContent = game.title;
+    const progress = document.createElement("small"); progress.className = "game-progress"; progress.textContent = `${index + 1} de ${prompts.length}`;
+    const prompt = document.createElement("p"); prompt.className = "game-prompt"; prompt.textContent = promptText;
+    panel.append(label, title, progress, prompt);
+    if (game.kind === "answer") {
+        const input = document.createElement("textarea"); input.maxLength = 500; input.placeholder = "Escreva sua resposta…"; input.value = saved.answers?.[index] || ""; input.setAttribute("aria-label", "Sua resposta"); panel.append(input);
+        const save = document.createElement("button"); save.className = "game-primary"; save.textContent = "Guardar resposta"; save.addEventListener("click", () => { saved.answers = { ...saved.answers, [index]: input.value.trim() }; gameProgress[activeGame] = saved; localStorage.setItem(gameProgressKey, JSON.stringify(gameProgress)); gameFeedback("Resposta guardada neste aparelho. Agora contem um ao outro 💗"); }); panel.append(save);
+    } else if (game.kind === "challenge") {
+        const done = document.createElement("button"); done.className = "game-primary"; done.textContent = saved.answers?.[index] ? "Desafio feito ✓" : "Fizemos!"; done.addEventListener("click", () => { saved.answers = { ...saved.answers, [index]: true }; gameProgress[activeGame] = saved; localStorage.setItem(gameProgressKey, JSON.stringify(gameProgress)); gameFeedback("Aí sim! Guardem esse momento 🩷"); done.textContent = "Desafio feito ✓"; }); panel.append(done);
+    } else {
+        const answers = document.createElement("div"); answers.className = "game-options";
+        const options = activeGame === "likely" ? game.options : item.options;
+        const selected = saved.answers?.[index];
+        options.forEach((option, optionIndex) => { const button = document.createElement("button"); button.type = "button"; button.className = `game-option${selected === optionIndex ? " chosen" : ""}${activeGame === "quiz" && selected !== undefined && optionIndex === item.answer ? " correct" : ""}`; button.textContent = option; button.addEventListener("click", () => { if (selected !== undefined) return; saved.answers = { ...saved.answers, [index]: optionIndex }; if (activeGame === "quiz" && optionIndex === item.answer) saved.score = (saved.score || 0) + 1; gameProgress[activeGame] = saved; localStorage.setItem(gameProgressKey, JSON.stringify(gameProgress)); renderGame(); gameFeedback(activeGame === "quiz" ? (optionIndex === item.answer ? "Acertou! Boa memória 💗" : "Quase! A resposta certa ficou marcada.") : "Escolha guardada. Agora vale ouvir o voto do outro também!"); }); answers.append(button); }); panel.append(answers);
+        if (activeGame === "quiz" && saved.answers?.[index] !== undefined) { const score = document.createElement("small"); score.className = "game-score"; score.textContent = `Placar: ${saved.score || 0} acerto(s)`; panel.append(score); }
+    }
+    const controls = document.createElement("div"); controls.className = "game-navigation";
+    const previous = document.createElement("button"); previous.type = "button"; previous.textContent = "← Anterior"; previous.disabled = index === 0; previous.addEventListener("click", () => moveGamePrompt(-1));
+    const next = document.createElement("button"); next.type = "button"; next.className = "game-next"; next.textContent = index === prompts.length - 1 ? (activeGame === "quiz" ? `Ver resultado · ${saved.score || 0}/${prompts.length}` : "Começar de novo ↻") : "Próxima →"; next.addEventListener("click", () => { if (index === prompts.length - 1 && activeGame === "quiz") { gameFeedback(`Vocês acertaram ${saved.score || 0} de ${prompts.length}! Que tal jogar de novo e ver se melhoram? 💞`); return; } if (index === prompts.length - 1) { saved.index = 0; saved.answers = {}; saved.score = 0; gameProgress[activeGame] = saved; localStorage.setItem(gameProgressKey, JSON.stringify(gameProgress)); renderGame(); } else moveGamePrompt(1); });
+    controls.append(previous, next); panel.append(controls);
+    const feedback = document.createElement("p"); feedback.id = "gameFeedback"; feedback.className = "game-feedback"; panel.append(feedback);
 }
+function moveGamePrompt(direction) { const state = gameProgress[activeGame] || { index: 0, answers: {}, score: 0 }; const count = coupleGames[activeGame].prompts.length; const current = Number.isInteger(state.index) ? state.index : 0; state.index = (current + direction + count) % count; gameProgress[activeGame] = state; localStorage.setItem(gameProgressKey, JSON.stringify(gameProgress)); renderGame(); }
+function gameFeedback(message) { const node = document.getElementById("gameFeedback"); if (node) node.textContent = message; }
+document.querySelectorAll("[data-game-tab]").forEach(button => {
+    button.addEventListener("click", () => { activeGame = button.dataset.gameTab; document.querySelectorAll("[data-game-tab]").forEach(tab => { const selected = tab === button; tab.classList.toggle("active", selected); tab.setAttribute("aria-selected", String(selected)); }); renderGame(); });
+    button.addEventListener("keydown", event => { if (!['ArrowRight', 'ArrowLeft'].includes(event.key)) return; event.preventDefault(); const tabs = [...document.querySelectorAll("[data-game-tab]")]; const index = tabs.indexOf(button); tabs[(index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length].click(); document.querySelector(`[data-game-tab="${activeGame}"]`).focus(); });
+});
+renderGame();
 
-function mapSavedNews(record) {
-    const publishedDate = new Date(`${record.published_on}T00:00:00`);
-    return {
-        id: record.id,
-        date: publishedDate.toLocaleDateString("en-US", {
-            day: "2-digit", month: "short", year: "numeric"
-        }).toUpperCase(),
-        title: record.title,
-        description: record.description
-    };
+/* Gatinho companheiro: passeia discretamente e reage ao toque. */
+const storyCat = document.getElementById("storyCat");
+const catReactions = ["Miau! Você é meu humano favorito.", "Um carinho pra você também 💗", "Prrr… que bom te ver por aqui!", "Patinha da sorte pra vocês.", "Vocês dois combinam muito!", "Hora de uma pausa pra um abraço?", "*se estica e dá um pulinho*", "Guardando esse carinho no meu coração 🩷"];
+let catReactionIndex = 0;
+let catTimer;
+function showCatReaction(message, duration = 2600) {
+    const bubble = document.getElementById("storyCatBubble");
+    bubble.textContent = message; bubble.classList.add("visible");
+    window.clearTimeout(catTimer); catTimer = window.setTimeout(() => bubble.classList.remove("visible"), duration);
 }
-
-async function loadSavedNews() {
-    const { data, error } = await supabaseClient.from("daily_news")
-        .select("id, title, description, published_on, created_at")
-        .order("created_at", { ascending: false });
-    if (error) throw error;
-    news = [...(data || []).map(mapSavedNews), ...starterNews];
-    renderNews();
-}
-
-function editNews(newsId) {
-    if (!galleryAdminIsAllowed) return;
-    const item = news.find(entry => entry.id === newsId);
-    if (!item) return;
-    editingNewsId = newsId;
-    document.getElementById("newsTitle").value = item.title;
-    document.getElementById("newsDescription").value = item.description;
-    document.getElementById("saveNewsButton").textContent = "SAVE CHANGES";
-    document.getElementById("cancelNewsEdit").hidden = false;
-    document.getElementById("newsStatus").textContent = "Editando notícia. Salve para aplicar as mudanças.";
-    document.getElementById("newsTitle").focus();
-}
-
-function cancelNewsEdit() {
-    editingNewsId = null;
-    document.getElementById("newsTitle").value = "";
-    document.getElementById("newsDescription").value = "";
-    document.getElementById("saveNewsButton").textContent = "PUBLISH NEWS";
-    document.getElementById("cancelNewsEdit").hidden = true;
-}
-
-async function deleteNews(newsId) {
-    if (!galleryAdminIsAllowed) return;
-    const item = news.find(entry => entry.id === newsId);
-    if (!item || !window.confirm(`Apagar a notícia “${item.title}”? Essa ação não pode ser desfeita.`)) return;
-    const status = document.getElementById("newsStatus");
-    status.textContent = "Apagando notícia…";
-    const { data, error } = await supabaseClient.from("daily_news")
-        .delete().eq("id", newsId).select("id");
-    if (error || !data?.length) {
-        console.error("Não foi possível apagar a notícia.", error);
-        status.textContent = "Não foi possível apagar. Entra como ADM e confira se o SQL atualizado foi executado.";
+document.addEventListener("click", event => {
+    if (document.querySelector("#pet.active-page") || !event.target.closest("button,.game-prompt,.calendar-event-row,.countdown-card,.relationship-card,.quote-section,.date-roulette")) return;
+    if (Math.random() < .13) showCatReaction("Ei… deixa eu escolher também! 🐾", 1800);
+}, true);
+window.addEventListener("click", event => {
+    const catBounds = storyCat.getBoundingClientRect();
+    const clickedCat = event.clientX >= catBounds.left && event.clientX <= catBounds.right && event.clientY >= catBounds.top && event.clientY <= catBounds.bottom && !storyCat.classList.contains("pet-is-home");
+    if (event.target.closest(".story-cat") || clickedCat) {
+    storyCat.classList.toggle("is-loved");
+    showCatReaction(catReactions[catReactionIndex % catReactions.length], 3300);
+    catReactionIndex++;
+    storyCat.classList.remove("is-jumping"); void storyCat.offsetWidth; storyCat.classList.add("is-jumping");
+    window.setTimeout(() => storyCat.classList.remove("is-jumping"), 850);
+    }
+}, true);
+window.setTimeout(() => showCatReaction("Oi! Toca em mim pra fazer carinho 🐾", 3200), 1800);
+window.setInterval(() => {
+    if (document.hidden || document.querySelector("dialog[open]") || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (Math.random() < .18) {
+        storyCat.classList.add("is-hiding");
+        window.setTimeout(() => { storyCat.classList.remove("is-hiding"); showCatReaction("Achei um cantinho secreto!", 2000); }, 2200 + Math.random() * 1800);
         return;
     }
-    news = news.filter(entry => entry.id !== newsId);
-    if (editingNewsId === newsId) cancelNewsEdit();
-    renderNews();
-    status.textContent = "Notícia apagada.";
+    const stops = ["9%", "15%", "85%", "91%"];
+    storyCat.style.left = stops[Math.floor(Math.random() * stops.length)];
+    storyCat.style.bottom = window.innerHeight < 500 ? `calc(78px + env(safe-area-inset-bottom))` : `${92 + Math.floor(Math.random() * Math.min(85, window.innerHeight * .1))}px`;
+    storyCat.classList.toggle("faces-left", Math.random() > .5);
+    if (Math.random() < .4) storyCat.classList.add("is-jumping");
+    window.setTimeout(() => storyCat.classList.remove("is-jumping"), 850);
+}, 8200);
+let catReturnTimer;
+window.addEventListener("scroll", () => { storyCat.classList.add("is-hiding"); window.clearTimeout(catReturnTimer); catReturnTimer = window.setTimeout(() => storyCat.classList.remove("is-hiding"), 1400); }, { passive: true });
+document.addEventListener("focusin", event => { if (event.target.matches("input,textarea,select")) storyCat.classList.add("is-hiding"); });
+document.addEventListener("focusout", event => { if (event.target.matches("input,textarea,select")) window.setTimeout(() => { if (!document.querySelector("input:focus,textarea:focus,select:focus")) storyCat.classList.remove("is-hiding"); }, 650); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden) loadGameContentFromCloud(); });
+window.addEventListener("focus", () => loadGameContentFromCloud());
+
+/* =========================================
+   NOSSO GATINHO E PASSEIO DE CARRINHO
+========================================= */
+const petStateKey = "loveChroniclePetState";
+const petDefaultState = { name: "Pipoca", food: 82, water: 86, joy: 88, energy: 78, lastTick: Date.now() };
+let petState = (() => { try { return { ...petDefaultState, ...JSON.parse(localStorage.getItem(petStateKey) || "{}") }; } catch (_) { return { ...petDefaultState }; } })();
+function petDecay() {
+    const now = Date.now();
+    const elapsedHours = Math.max(0, Math.min(48, (now - (Number(petState.lastTick) || now)) / 3600000));
+    petState.food = Math.max(0, Math.round(petState.food - elapsedHours * .7));
+    petState.water = Math.max(0, Math.round(petState.water - elapsedHours * 1.05));
+    petState.joy = Math.max(0, Math.round(petState.joy - elapsedHours * .32));
+    petState.energy = Math.min(100, Math.round(petState.energy + elapsedHours * .22));
+    petState.lastTick = now;
 }
+function savePetLocally() { petState.lastTick = Date.now(); try { localStorage.setItem(petStateKey, JSON.stringify(petState)); } catch (_) {} }
+function renderPet() {
+    const values = { Food: petState.food, Water: petState.water, Joy: petState.joy, Energy: petState.energy };
+    Object.entries(values).forEach(([key, value]) => { const id = key === "Food" ? "Food" : key; const number = document.getElementById(`pet${id}Value`), meter = document.getElementById(`pet${id}Meter`); if (number) number.textContent = `${value}%`; if (meter) { meter.style.width = `${value}%`; meter.classList.toggle("low", value < 30); } });
+    const name = document.getElementById("petNameDisplay"); if (name) name.textContent = petState.name;
+    const gameCaption = document.querySelector(".pet-game-heading p"); if (gameCaption) gameCaption.textContent = `Ajude ${petState.name} a pular os brinquedos no caminho.`;
+    const mood = document.getElementById("petMoodText"), icon = document.getElementById("petMoodIcon"), cat = document.getElementById("petRoomCat");
+    const lowest = Math.min(petState.food, petState.water, petState.joy, petState.energy);
+    const moodInfo = lowest < 22 ? ["Precisa de um cuidado", "♡", "cat-sad"] : lowest < 48 ? ["Um pouco carente", "♥", "cat-soft"] : petState.joy > 78 ? ["Feliz de ver vocês", "♡", "cat-happy"] : ["Curtindo o dia", "✦", "cat-idle"];
+    if (mood) mood.textContent = moodInfo[0]; if (icon) icon.textContent = moodInfo[1]; if (cat) { cat.classList.remove("cat-sad", "cat-soft", "cat-happy", "cat-idle"); cat.classList.add(moodInfo[2]); cat.setAttribute("aria-label", `${petState.name}, ${moodInfo[0].toLowerCase()}`); }
+    const best = Number(localStorage.getItem("loveChronicleCarBest") || 0); const bestLabel = document.getElementById("petCarBest"); if (bestLabel) bestLabel.textContent = String(best);
+}
+async function savePetToCloud() {
+    savePetLocally();
+    if (!supabaseClient || !galleryAdminUser) return;
+    const { data: coupleId, error: coupleError } = await supabaseClient.rpc("current_couple_id");
+    if (coupleError || !coupleId) return;
+    const { error } = await supabaseClient.from("couple_pet_state").upsert({ couple_id: coupleId, pet_name: petState.name, food: petState.food, water: petState.water, joy: petState.joy, energy: petState.energy, last_tick: new Date().toISOString(), updated_at: new Date().toISOString() }, { onConflict: "couple_id" });
+    if (error) { console.warn("Pet state saved locally; cloud sync needs supabase-pet-setup.sql", error); return; }
+}
+async function loadPetFromCloud() {
+    petDecay();
+    if (supabaseClient && galleryAdminUser) {
+        const { data, error } = await supabaseClient.from("couple_pet_state").select("pet_name,food,water,joy,energy,last_tick").maybeSingle();
+        if (!error && data) {
+            petState = { name: data.pet_name || "Pipoca", food: data.food, water: data.water, joy: data.joy, energy: data.energy, lastTick: Date.parse(data.last_tick) || Date.now() };
+            petDecay(); await savePetToCloud();
+        } else if (!error && !data) await savePetToCloud();
+    }
+    renderPet();
+}
+function speakForPet(message, mood = "cat-happy") {
+    const speech = document.getElementById("petSpeech"); const cat = document.getElementById("petRoomCat");
+    if (speech) { speech.textContent = message; speech.classList.remove("is-speaking"); void speech.offsetWidth; speech.classList.add("is-speaking"); }
+    if (cat) { cat.classList.remove("cat-sad", "cat-soft", "cat-happy", "cat-idle"); cat.classList.add(mood); }
+}
+document.querySelectorAll("[data-pet-action]").forEach(button => button.addEventListener("click", async () => {
+    const action = button.dataset.petAction;
+    if (action === "feed") { petState.food = Math.min(100, petState.food + 34); petState.joy = Math.min(100, petState.joy + 5); speakForPet("Nh am! Obrigada pela comidinha!", "cat-happy"); }
+    if (action === "water") { petState.water = Math.min(100, petState.water + 38); speakForPet("Glup, glup… água fresquinha!", "cat-happy"); }
+    if (action === "pet") { petState.joy = Math.min(100, petState.joy + 17); speakForPet("Prrr… mais um carinho?", "cat-loved"); }
+    if (action === "play") { petState.joy = Math.min(100, petState.joy + 20); petState.energy = Math.max(0, petState.energy - 12); speakForPet("Pega o novelo! Corre, corre!", "cat-jump"); }
+    renderPet(); await savePetToCloud();
+    const status = document.getElementById("petCareMessage"); if (status) status.textContent = action === "feed" ? "Barriguinha feliz. Obrigado pelo lanchinho!" : action === "water" ? "Sede saciada com água fresquinha." : action === "pet" ? "Carinho recebido e guardado com amor." : "Brincadeira boa! Ele gastou um pouquinho de energia.";
+}));
+document.getElementById("petRenameButton").addEventListener("click", async () => {
+    const value = window.prompt("Como vocês querem chamar o gatinho?", petState.name);
+    if (value === null) return;
+    const name = value.trim().slice(0, 18); if (!name) return;
+    petState.name = name; renderPet(); await savePetToCloud(); speakForPet(`Oi! Meu nome é ${name} agora!`);
+});
+renderPet();
+loadPetFromCloud();
+window.setInterval(() => { petDecay(); renderPet(); savePetLocally(); }, 60000);
+
+// Jogo de carrinho: velocidade constante, obstáculos, gravidade e salto.
+const carCanvas = document.getElementById("petCarCanvas");
+const carContext = carCanvas.getContext("2d");
+const carGame = { running: false, frame: 0, distance: 0, speed: 5.4, obstacles: [], nextObstacle: 90, playerY: 184, velocityY: 0, ground: 184, wheelPhase: 0 };
+function carRoundedRect(ctx, x, y, width, height, radius) { const r=Math.min(radius,width/2,height/2); ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+width-r,y); ctx.quadraticCurveTo(x+width,y,x+width,y+r); ctx.lineTo(x+width,y+height-r); ctx.quadraticCurveTo(x+width,y+height,x+width-r,y+height); ctx.lineTo(x+r,y+height); ctx.quadraticCurveTo(x,y+height,x,y+height-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); }
+function drawCatCar() {
+    const ctx = carContext, road = 236, x = 93, y = carGame.playerY;
+    ctx.clearRect(0, 0, 720, 300);
+    const sky = ctx.createLinearGradient(0, 0, 0, 240); sky.addColorStop(0, "#f8e7ef"); sky.addColorStop(1, "#fffbfd"); ctx.fillStyle = sky; ctx.fillRect(0, 0, 720, 240);
+    ctx.fillStyle = "#e9b9cb"; ctx.beginPath(); ctx.arc(610, 52, 23, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#dfbdd0"; [[185,155,46],[250,165,30],[520,150,48],[566,171,34]].forEach(([tx,ty,r])=>{ctx.beginPath();ctx.arc(tx,ty,r,0,Math.PI*2);ctx.fill();});
+    ctx.fillStyle = "#8d6f83"; ctx.fillRect(0, road, 720, 64); ctx.fillStyle = "#e7c9d9"; ctx.fillRect(0, road, 720, 4);
+    ctx.fillStyle = "#f9e5ed"; for (let mark = -50 + (carGame.frame * carGame.speed) % 105; mark < 720; mark += 105) ctx.fillRect(mark, road + 35, 50, 5);
+    carGame.obstacles.forEach(obstacle => { ctx.fillStyle = obstacle.kind === 0 ? "#cf82a1" : "#d99e77"; if (obstacle.kind === 0) { carRoundedRect(ctx,obstacle.x,road-obstacle.height,27,obstacle.height,5); ctx.fill(); ctx.fillStyle = "#f8e4ec"; ctx.fillRect(obstacle.x + 5, road - obstacle.height + 8, 17, 5); } else { ctx.beginPath(); ctx.arc(obstacle.x + 14, road - 13, 13, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#fff0f5"; ctx.beginPath(); ctx.arc(obstacle.x + 10, road - 17, 3, 0, Math.PI * 2); ctx.fill(); } });
+    // Carrinho e rodas animadas.
+    ctx.fillStyle = "#df82a3"; ctx.beginPath(); ctx.moveTo(x, y + 21); ctx.quadraticCurveTo(x + 5, y + 4, x + 32, y + 4); ctx.lineTo(x + 79, y + 6); ctx.quadraticCurveTo(x + 92, y + 10, x + 96, y + 31); ctx.lineTo(x + 89, y + 40); ctx.lineTo(x + 7, y + 40); ctx.quadraticCurveTo(x - 1, y + 37, x, y + 21); ctx.fill();
+    ctx.fillStyle = "#f9dce7"; ctx.beginPath(); ctx.moveTo(x + 28, y + 8); ctx.lineTo(x + 51, y + 8); ctx.lineTo(x + 51, y + 22); ctx.lineTo(x + 12, y + 22); ctx.quadraticCurveTo(x + 15, y + 10, x + 28, y + 8); ctx.fill();
+    ctx.fillStyle = "#fff8fb"; carRoundedRect(ctx,x+59,y+10,23,11,4); ctx.fill();
+    ctx.fillStyle = "#513849"; [[x+22,y+39],[x+75,y+39]].forEach(([wx,wy])=>{ctx.beginPath();ctx.arc(wx,wy,10,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#f1cbda";ctx.lineWidth=2;ctx.beginPath();ctx.arc(wx,wy,4,carGame.wheelPhase,carGame.wheelPhase+Math.PI*1.6);ctx.stroke();});
+    // Cabecinha da Pipoca visível pela janela.
+    ctx.fillStyle = "#dfa77e"; ctx.beginPath(); ctx.arc(x + 34, y - 4, 13, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x+24,y-12);ctx.lineTo(x+25,y-25);ctx.lineTo(x+35,y-16);ctx.moveTo(x+35,y-16);ctx.lineTo(x+44,y-25);ctx.lineTo(x+45,y-12);ctx.fill();
+    ctx.fillStyle = "#392736"; ctx.beginPath();ctx.arc(x+30,y-4,1.5,0,Math.PI*2);ctx.arc(x+38,y-4,1.5,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle="#fff4f8";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+93,y+22);ctx.lineTo(x+99,y+21);ctx.stroke();
+}
+function setCarOverlay(show, title, message) { const overlay=document.getElementById("petCarOverlay"); overlay.hidden=!show; if(title) overlay.querySelector("strong").textContent=title; if(message) overlay.querySelector("small").textContent=message; document.getElementById("petCarRestart").hidden=show&&title?.startsWith("Fim"); }
+function carJump() { if(!carGame.running || carGame.playerY < carGame.ground - 1) return; carGame.velocityY=-11.7; }
+function tickCarGame() {
+    if (!carGame.running) return;
+    carGame.frame++; carGame.distance += carGame.speed / 46; carGame.wheelPhase += .2;
+    carGame.playerY += carGame.velocityY; carGame.velocityY += .55; if(carGame.playerY>carGame.ground){carGame.playerY=carGame.ground;carGame.velocityY=0;}
+    carGame.nextObstacle--;
+    if(carGame.nextObstacle<=0){carGame.obstacles.push({x:740,kind:Math.random()<.58?0:1,height:28+Math.random()*18});carGame.nextObstacle=70+Math.random()*55;}
+    carGame.obstacles.forEach(obstacle=>obstacle.x-=carGame.speed); carGame.obstacles=carGame.obstacles.filter(obstacle=>obstacle.x>-50);
+    const playerLeft=93, playerRight=189, playerBottom=carGame.playerY+40;
+    const collision=carGame.obstacles.some(obstacle=>playerRight>obstacle.x+3&&playerLeft<obstacle.x+25&&playerBottom>236-(obstacle.kind===0?obstacle.height:24));
+    drawCatCar(); document.getElementById("petCarScore").textContent=`${Math.floor(carGame.distance)} m`;
+    if(collision){carGame.running=false;const score=Math.floor(carGame.distance),best=Math.max(score,Number(localStorage.getItem("loveChronicleCarBest")||0));localStorage.setItem("loveChronicleCarBest",String(best));petState.joy=Math.min(100,petState.joy+5);petState.energy=Math.max(0,petState.energy-4);renderPet();savePetToCloud();setCarOverlay(true,"Fim de passeio!",`Vocês percorreram ${score} metros. Vamos tentar de novo?`);speakForPet("Foi uma aventura e tanto! Vamos mais uma vez?");return;}
+    if(carGame.frame%600===0)carGame.speed=Math.min(8.5,carGame.speed+.25);
+    requestAnimationFrame(tickCarGame);
+}
+function startCarGame() { if(carGame.running)return;Object.assign(carGame,{running:true,frame:0,distance:0,speed:5.4,obstacles:[],nextObstacle:85,playerY:184,velocityY:0});setCarOverlay(false);document.getElementById("petCarRestart").hidden=false;speakForPet("Segura firme, Pipoca! Lá vamos nós!");requestAnimationFrame(tickCarGame); }
+document.getElementById("petCarStart").addEventListener("click", startCarGame);
+document.getElementById("petCarRestart").addEventListener("click", startCarGame);
+document.getElementById("petCarJump").addEventListener("pointerdown", event=>{event.preventDefault();carJump();});
+carCanvas.addEventListener("pointerdown", carJump);
+document.addEventListener("keydown", event=>{if((event.code==="Space"||event.code==="ArrowUp")&&document.getElementById("pet").classList.contains("active-page")&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){event.preventDefault();carJump();}});
+drawCatCar();
 
 
 /* =========================================
@@ -2319,48 +2589,3 @@ document.addEventListener(
 
     }
 );
-
-
-/* =========================================
-   FRASES DE BREAKING NEWS
-========================================= */
-
-const breakingNews = [
-
-    "Jesus continua escrevendo a história mais bonita de todas.",
-
-    "URGENTE: A Gabi continua sendo considerada a pessoa mais importante na vida do Samuel.",
-
-    "EXCLUSIVO: Jesus confirma que o amor continuara crescendo até ele voltar.",
-
-    "PLANTÃO: Diz Samuel: mais um dia ao lado da gabi é melhor coisa do mundo.",
-
-    "ÚLTIMA HORA: especialistas afirmam que quando estão juntos é a melhor parte do dia.",
-
-    "BREAKING: Eles ficarão juntos até o Fim dos tempos."
-
-];
-
-
-let breakingIndex = 0;
-
-
-setInterval(() => {
-
-    breakingIndex++;
-
-    if (
-        breakingIndex >=
-        breakingNews.length
-    ) {
-
-        breakingIndex = 0;
-
-    }
-
-    document.getElementById(
-        "breakingNews"
-    ).textContent =
-        breakingNews[breakingIndex];
-
-}, 5000);

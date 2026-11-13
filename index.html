@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css?v=20261027-countdowns-settings">
+    <link rel="stylesheet" href="style.css?v=20261112-cat-questions">
 </head>
 
 <body class="app-opening">
@@ -28,16 +28,14 @@
         <div class="logo">
             <span class="logo-small">OUR STORY</span>
             <h1>Samuel &amp; Gabi</h1>
-            <span class="logo-subtitle">
-                Our favorite little moments.
-            </span>
+            <span class="logo-subtitle">Our favorite little moments.</span>
         </div>
 
         <div class="header-actions">
             <button id="optionsButton" class="options-button" type="button" aria-label="Mais opções" aria-haspopup="menu" aria-expanded="false">⋮</button>
             <div id="optionsMenu" class="options-menu" role="menu" hidden>
                 <button id="settingsMenuItem" type="button" role="menuitem">Settings</button>
-                <button id="adminMenuItem" type="button" role="menuitem">Admin login</button>
+                <button id="adminMenuItem" type="button" role="menuitem">Sign in</button>
             </div>
             <aside id="musicMixer" class="music-mixer is-collapsed" aria-label="Background music player">
                 <div id="musicMixerPanel" class="music-mixer-panel" aria-hidden="true">
@@ -66,6 +64,8 @@
 
     </div>
 
+    </header>
+
     <nav class="navigation">
 
         <button class="nav-btn active" data-page="home" aria-label="Home">
@@ -73,28 +73,30 @@
         </button>
 
         <button class="nav-btn" data-page="photos" aria-label="Momentos">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>Moments</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>Fotos</span>
         </button>
 
         <button class="nav-btn" data-page="timeline" aria-label="Amor">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg><span>Love</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg><span>Amor</span>
         </button>
 
         <button class="nav-btn" data-page="dates" aria-label="Datas">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>Dates</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>Datas</span>
         </button>
 
-        <button class="nav-btn" data-page="world" aria-label="Localização ao vivo">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span>World</span>
+        <button class="nav-btn" data-page="play" aria-label="Jogos">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h4m-2-2v4m7-2h.01M18 10h.01M6.5 7h11a3 3 0 0 1 2.9 2.2l1.1 4.3a2 2 0 0 1-3.3 2l-2.2-1.8H8l-2.2 1.8a2 2 0 0 1-3.3-2l1.1-4.3A3 3 0 0 1 6.5 7Z"/></svg><span>Jogos</span>
+        </button>
+
+        <button class="nav-btn" data-page="pet" aria-label="Gatinho">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10 3.5 4l5 3a8.8 8.8 0 0 1 7 0l5-3L20 10a8 8 0 1 1-16 0Z"/><path d="M8 12h.01M16 12h.01M10 16c1.2 1 2.8 1 4 0"/></svg><span>Pet</span>
         </button>
 
         <button class="nav-btn" data-page="our-plans" aria-label="Nós">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2M19 8a4 4 0 0 1 0 8m3 5v-2a7 7 0 0 0-4-6.3"/></svg><span>Us</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 14 0v2M19 8a4 4 0 0 1 0 8m3 5v-2a7 7 0 0 0-4-6.3"/></svg><span>Nós</span>
         </button>
 
     </nav>
-
-</header>
 
 <dialog id="settingsDialog" class="settings-dialog" aria-labelledby="settingsTitle">
     <div class="settings-dialog-heading">
@@ -120,19 +122,6 @@
         <button id="galleryAdminLogout" type="button" onclick="logoutGalleryAdmin()" hidden>Sair da conta</button>
         <p id="galleryAdminStatus" class="upload-status" role="status" aria-live="polite"></p>
     </section>
-    <section class="settings-section location-settings-section">
-        <span class="settings-eyebrow">LOCALIZAÇÃO AO VIVO</span>
-        <h3>Compartilhamento do casal</h3>
-        <p id="locationPrivacyCopy">Você escolhe quando compartilhar. A outra conta vinculada pode ver sua posição enquanto estiver ativo; o OpenStreetMap recebe as coordenadas para montar o mapa.</p>
-        <div id="locationPairStatus" class="location-status" role="status" aria-live="polite">Entre com uma conta do casal para verificar o vínculo.</div>
-        <div id="locationPartnerCard" class="location-partner-card" hidden>
-            <span class="location-status-dot" aria-hidden="true"></span>
-            <div><b id="locationPartnerName">Localização da outra pessoa</b><small id="locationPartnerUpdated"></small></div>
-            <a id="locationPartnerMapLink" href="#world" hidden>Open on map</a>
-        </div>
-        <button id="locationShareToggle" class="location-share-toggle" type="button" disabled>Ativar compartilhamento</button>
-        <p id="locationShareStatus" class="settings-status" aria-live="polite"></p>
-    </section>
 </dialog>
 
 
@@ -145,23 +134,12 @@
 
 <section id="home" class="page active-page">
 
-    <div class="breaking-news">
-            <span class="breaking-label">A NOTE FROM US:</span>
-
-        <div class="breaking-text">
-            <span id="breakingNews">
-                    Hey, welcome. Make yourself at home.
-            </span>
-        </div>
-    </div>
-
-
     <section class="hero">
 
         <article class="main-story">
 
             <div class="image-container">
-                <img id="memoryImage" src="images/foto9.jpeg" alt="Samuel e Gabi juntos">
+                <img id="memoryImage" src="images/web/foto9.jpg" alt="Samuel e Gabi juntos" fetchpriority="high" decoding="async">
                 <video id="memoryVideo" muted playsinline loop hidden></video>
                 <div id="memoryDots" class="memory-dots" aria-label="Selecionar lembrança"></div>
             </div>
@@ -189,7 +167,7 @@
 
             <article class="small-story">
 
-                <img src="images/foto1.jpg" alt="Momento especial">
+                <img src="images/web/foto1.jpg" alt="Momento especial" loading="lazy" decoding="async">
 
                 <div>
                     <span class="category-text">
@@ -210,7 +188,7 @@
 
             <article class="small-story">
 
-                <img src="images/foto4.jpg" alt="Momento juntos">
+                <img src="images/web/foto4.jpg" alt="Momento juntos" loading="lazy" decoding="async">
 
                 <div>
                     <span class="category-text">
@@ -259,24 +237,24 @@
 
         <div class="moment-grid" id="littleMomentsGrid" aria-live="off"></div>
         <div id="littleMomentEntries" hidden>
-            <div data-image="images/foto1.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 1" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto2.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 2" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto3.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 3" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto4.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 4" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto5.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 5" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto6.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 6" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto7.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 7" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto8.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 8" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto9.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 9" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto10.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 10" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto11.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 11" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto12.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 12" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto13.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 13" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto14.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 14" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto15.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 15" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto16.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 16" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto17.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 17" data-comment="A little memory from our story."></div>
-            <div data-image="images/foto18.jpeg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 18" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto1.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 1" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto2.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 2" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto3.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 3" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto4.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 4" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto5.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 5" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto6.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 6" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto7.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 7" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto8.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 8" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto9.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 9" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto10.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 10" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto11.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 11" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto12.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 12" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto13.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 13" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto14.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 14" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto15.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 15" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto16.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 16" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto17.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 17" data-comment="A little memory from our story."></div>
+            <div data-image="images/web/foto18.jpg" data-kicker="A LITTLE MOMENT" data-title="Our little moment 18" data-comment="A little memory from our story."></div>
         </div>
         <template id="littleMomentCardTemplate">
             <article class="moment-card">
@@ -289,7 +267,7 @@
     </details>
 
     <section class="relationship-card" aria-label="Contagem do nosso amor">
-        <div class="relationship-photo"><img src="images/foto9.jpeg" alt="Samuel e Gabi juntos"></div>
+        <div class="relationship-photo"><img src="images/web/foto9.jpg" alt="Samuel e Gabi juntos" loading="lazy" decoding="async"></div>
         <div class="relationship-copy"><span>TIME TOGETHER</span><strong id="loveCounter">5 MESES · 29 DIAS</strong><small id="loveCounterTime">00 H · 00 MIN · 00 SEG</small><small class="relationship-since">Since April 3, 2026</small></div>
         <span class="relationship-heart" aria-hidden="true">♡</span>
     </section>
@@ -337,42 +315,18 @@
 
 <!-- ================= PHOTOS ================= -->
 
-<section id="world" class="page location-page">
-    <div class="page-header location-page-header">
-        <span>JUST THE TWO OF US</span>
-        <h2>Our little world</h2>
-        <p>See each other on the map whenever location sharing is on.</p>
-    </div>
-    <div class="location-map-card">
-        <div class="location-map-heading">
-            <div><span class="settings-eyebrow">LIVE LOCATION</span><h3 id="worldLocationTitle">Waiting for your shared location</h3></div>
-            <span id="worldLocationIndicator" class="location-live-indicator">OFF</span>
-        </div>
-        <div id="locationMapEmpty" class="location-map-empty" role="status" aria-live="polite">
-            <span aria-hidden="true">♡</span>
-            <b id="locationMapMessage">Sign in and turn on location sharing to see the map.</b>
-        </div>
-        <iframe id="locationMapFrame" class="location-map-frame" title="Map showing the shared location" loading="lazy" referrerpolicy="no-referrer" hidden></iframe>
-        <div class="location-map-footer">
-            <span id="worldLocationUpdated" aria-live="polite">Location sharing is off.</span>
-            <button id="worldLocationShareToggle" class="location-share-toggle" type="button" disabled>Share my location</button>
-        </div>
-    </div>
-    <p class="location-map-note">Each of you controls sharing and can stop anytime in Settings. OpenStreetMap receives the map coordinates to display the map.</p>
-</section>
-
 <section id="photos" class="page">
 
     <div class="page-header">
 
-        <span>THE PHOTO ALBUM</span>
+        <span>OUR PHOTOS</span>
 
         <h2>
-            Our memories
+            Nossas memórias
         </h2>
 
         <p>
-            The ones we keep coming back to.
+            Fotos, vídeos e pequenos momentos nossos.
         </p>
 
     </div>
@@ -419,10 +373,10 @@
     </details>
 
     <details class="compact-section upload-fold">
-    <summary><span>Add a memory</span><small>Save another photo or video</small></summary>
-    <section class="news-upload-panel memory-upload-panel">
-        <div class="plan-panel-heading"><span class="section-label">OUR PHOTOS</span><h3>Save another memory</h3><p>Add a photo or video for us to look back on.</p></div>
-        <div class="news-upload-form">
+    <summary><span>Nova lembrança</span><small>Envie uma foto ou vídeo</small></summary>
+    <section class="upload-panel memory-upload-panel">
+        <div class="plan-panel-heading"><span class="section-label">NOSSO ÁLBUM</span><h3>Guardar um momento</h3><p>Escolha o arquivo e, se quiser, escreva uma legenda.</p></div>
+        <div class="upload-form">
             <span class="upload-label">Escolha uma foto ou vídeo</span>
             <div class="memory-file-picker-row">
                 <label class="place-photo-picker memory-file-picker" for="memoryFile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h3l1.4-2h7.2l1.4 2h3A1.5 1.5 0 0 1 21.5 9v9A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9A1.5 1.5 0 0 1 4 7.5Z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Escolher arquivo</span></label>
@@ -432,15 +386,7 @@
             <input type="text" id="memoryUploadTitle" maxlength="100" placeholder="Título do momento (opcional)">
             <textarea id="memoryUploadSubtitle" maxlength="300" placeholder="Uma legenda para essa lembrança (opcional)"></textarea>
             <input type="hidden" id="memoryUploadCategory" value="us">
-            <div class="r2-admin-login" id="r2AdminLogin">
-                <label for="r2AdminPassword">Senha de administração da galeria</label>
-                <div class="r2-admin-controls">
-                    <input id="r2AdminPassword" type="password" autocomplete="current-password" placeholder="Senha da galeria" aria-label="Senha de administração da galeria">
-                    <button id="r2AdminLoginButton" type="button">ENTRAR</button>
-                    <button id="r2AdminLogoutButton" type="button" hidden>SAIR</button>
-                </div>
-                <span id="r2AdminStatus" role="status" aria-live="polite">Entre para enviar ou apagar lembranças na nuvem.</span>
-            </div>
+            <p class="upload-status">Entre na conta de vocês em Settings para enviar ou apagar fotos e vídeos.</p>
             <button id="uploadMemoryButton" class="memory-upload-button" type="button" onclick="addMemoryUpload()">Adicionar à galeria</button>
             <p id="uploadStatus" class="upload-status" role="status" aria-live="polite"></p>
         </div>
@@ -508,7 +454,7 @@
 
             <div class="timeline-card">
 
-                <img src="images/foto8.jpg" alt="Começo">
+                <img src="images/web/foto8.jpg" alt="Começo" loading="lazy" decoding="async">
 
                 <div>
 
@@ -542,7 +488,7 @@
 
             <div class="timeline-card">
 
-                <img src="images/foto7.jpg" alt="Primeiros momentos">
+                <img src="images/web/foto7.jpg" alt="Primeiros momentos" loading="lazy" decoding="async">
 
                 <div>
 
@@ -577,7 +523,7 @@
 
             <div class="timeline-card">
 
-                <img src="images/foto3.jpg" alt="Nossa história">
+                <img src="images/web/foto3.jpg" alt="Nossa história" loading="lazy" decoding="async">
 
                 <div>
 
@@ -669,12 +615,89 @@
 </section>
 
 <section id="dates" class="page">
-    <div class="page-header"><span>COMING UP</span><h2>Dates to look forward to</h2><p>All the little big days on our calendar.</p></div>
-    <details class="compact-section dates-fold" open>
-      <summary><span>Our countdowns</span><small>Birthdays, anniversaries and the big days</small></summary>
-      <div id="countdownGrid" class="countdown-grid" aria-live="off"></div>
-    </details>
+    <div class="page-header"><span>OUR CALENDAR</span><h2>Days worth keeping</h2><p>Birthdays, little plans, and the dates we look forward to.</p></div>
+    <section class="couple-calendar" aria-label="Calendário do casal">
+      <div class="calendar-topline"><button id="calendarPrev" type="button" aria-label="Mês anterior">‹</button><div><h3 id="calendarMonthTitle"></h3><small>Little plans, big days</small></div><button id="calendarNext" type="button" aria-label="Próximo mês">›</button><button id="calendarAddButton" class="calendar-add" type="button" aria-label="Criar evento">+</button></div>
+      <div class="calendar-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+      <div id="calendarDays" class="calendar-days" role="grid" aria-label="Dias do mês"></div>
+      <div class="calendar-legend"><span>💗 Anniversary</span><span>🎂 Birthday</span><span>✈️ Trip</span><span>✦ Plans</span></div>
+      <section class="calendar-upcoming"><div class="calendar-section-heading"><div><span class="section-label">UP NEXT</span><h3>Coming up</h3></div><button id="calendarViewAll" type="button">View all</button></div><div id="calendarUpcoming" class="calendar-event-list"></div></section>
+      <div id="countdownGrid" class="countdown-grid" aria-label="Contadores importantes"></div>
+      <p id="calendarStatus" class="calendar-status" role="status" aria-live="polite"></p>
+    </section>
 </section>
+
+<section id="play" class="page">
+  <div class="page-header"><span>SÓ NÓS DOIS</span><h2>Vamos brincar?</h2><p>Perguntas, desafios bobos e descobertas um sobre o outro.</p></div>
+  <section class="play-hub">
+    <div class="play-shortcuts" role="tablist" aria-label="Escolha uma brincadeira">
+      <button id="gameTab-question" class="play-shortcut active" type="button" data-game-tab="question" role="tab" aria-controls="gamePanel" aria-selected="true"><span>💬</span><b>Perguntas</b></button>
+      <button id="gameTab-likely" class="play-shortcut" type="button" data-game-tab="likely" role="tab" aria-controls="gamePanel" aria-selected="false"><span>🎮</span><b>Quem faria?</b></button>
+      <button id="gameTab-quiz" class="play-shortcut" type="button" data-game-tab="quiz" role="tab" aria-controls="gamePanel" aria-selected="false"><span>💗</span><b>Quiz do casal</b></button>
+      <button id="gameTab-would-you" class="play-shortcut" type="button" data-game-tab="would-you" role="tab" aria-controls="gamePanel" aria-selected="false"><span>✨</span><b>Você prefere?</b></button>
+      <button id="gameTab-challenge" class="play-shortcut" type="button" data-game-tab="challenge" role="tab" aria-controls="gamePanel" aria-selected="false"><span>🐾</span><b>Desafios</b></button>
+    </div>
+    <div class="play-card" id="gamePanel" role="tabpanel" aria-labelledby="gameTab-question" aria-live="polite"></div>
+    <details class="question-manager" id="questionManager">
+      <summary>✎ &nbsp;Montar nossas perguntas</summary>
+      <p>Adicione perguntas suas ou edite e apague as que já existem. Elas ficam salvas neste aparelho; entre na conta do casal para sincronizar com o Supabase.</p>
+      <form id="questionEditorForm">
+        <label>Brincadeira<select id="questionGameSelect"><option value="question">Perguntas</option><option value="likely">Quem faria?</option><option value="quiz">Quiz do casal</option><option value="would-you">Você prefere?</option><option value="challenge">Desafios</option></select></label>
+        <label>Pergunta ou desafio<textarea id="questionPromptInput" maxlength="300" required placeholder="Escreva aqui…"></textarea></label>
+        <label id="questionOptionsField">Opções (uma por linha)<textarea id="questionOptionsInput" maxlength="300" placeholder="A primeira opção&#10;A segunda opção"></textarea></label>
+        <label id="questionAnswerField" hidden>Resposta certa (número da opção)<input id="questionAnswerInput" type="number" min="1" max="8" value="1"></label>
+        <div class="question-form-actions"><button class="game-primary" type="submit" id="questionSaveButton">Adicionar pergunta</button><button class="question-cancel" type="button" id="questionCancelButton" hidden>Cancelar edição</button></div>
+      </form>
+      <div class="question-editor-list" id="questionEditorList" aria-live="polite"></div>
+      <p id="questionEditorStatus" class="question-editor-status" role="status" aria-live="polite"></p>
+    </details>
+    <p class="play-note">As respostas ficam guardadas neste aparelho.</p>
+  </section>
+</section>
+
+<section id="pet" class="page">
+  <div class="page-header"><span>NOSSO GATINHO</span><h2>Um cantinho pra cuidar</h2><p>Dê carinho, comida e água. Depois, bora dar uma voltinha?</p></div>
+  <section class="pet-home">
+    <div class="pet-scene" id="petScene">
+      <span class="pet-scene-sun" aria-hidden="true">✦</span><span class="pet-scene-cloud cloud-one" aria-hidden="true"></span><span class="pet-scene-cloud cloud-two" aria-hidden="true"></span>
+      <div class="pet-floor" aria-hidden="true"></div>
+      <div class="pet-room-cat cat-idle" id="petRoomCat" role="img" aria-label="Nosso gatinho, feliz e passeando">
+        <img class="pet-cat-photo" src="images/web/our-cat.jpg" alt="" aria-hidden="true">
+        <span class="pet-room-heart" aria-hidden="true">♥</span>
+      </div>
+      <div class="pet-speech" id="petSpeech" aria-live="polite">Miau! Que bom que você voltou.</div>
+      <div class="pet-nameplate"><span>SEU COMPANHEIRINHO</span><strong id="petNameDisplay">Pipoca</strong><button id="petRenameButton" type="button" aria-label="Trocar o nome do gatinho">✎</button></div>
+    </div>
+    <div class="pet-status-card">
+      <div class="pet-status-heading"><div><span class="section-label">COMO ELE ESTÁ?</span><h3 id="petMoodText">Feliz de ver vocês</h3></div><span class="pet-mood-icon" id="petMoodIcon" aria-hidden="true">♡</span></div>
+      <div class="pet-needs">
+        <div class="pet-need"><div><span>Fome</span><b id="petFoodValue">88%</b></div><div class="pet-meter"><i id="petFoodMeter"></i></div></div>
+        <div class="pet-need"><div><span>Sede</span><b id="petWaterValue">90%</b></div><div class="pet-meter"><i id="petWaterMeter"></i></div></div>
+        <div class="pet-need"><div><span>Alegria</span><b id="petJoyValue">86%</b></div><div class="pet-meter"><i id="petJoyMeter"></i></div></div>
+        <div class="pet-need"><div><span>Energia</span><b id="petEnergyValue">78%</b></div><div class="pet-meter"><i id="petEnergyMeter"></i></div></div>
+      </div>
+      <div class="pet-care-actions"><button type="button" data-pet-action="feed"><span>🥣</span><b>Dar comida</b></button><button type="button" data-pet-action="water"><span>💧</span><b>Dar água</b></button><button type="button" data-pet-action="pet"><span>♡</span><b>Fazer carinho</b></button><button type="button" data-pet-action="play"><span>🧶</span><b>Brincar</b></button></div>
+      <p class="pet-care-message" id="petCareMessage" role="status" aria-live="polite">Um pouquinho de atenção já deixa o dia dele melhor.</p>
+    </div>
+  </section>
+  <section class="pet-game-card" aria-labelledby="petGameTitle">
+    <div class="pet-game-heading"><div><span class="section-label">MINIGAME</span><h3 id="petGameTitle">Passeio de carrinho</h3><p>Ajude a Pipoca a pular os brinquedos no caminho.</p></div><span class="pet-game-best">Recorde <b id="petCarBest">0</b></span></div>
+    <div class="pet-game-screen"><canvas id="petCarCanvas" width="720" height="300" aria-label="Jogo de carrinho: desvie dos obstáculos pulando"></canvas><div id="petCarOverlay" class="pet-game-overlay"><span>🏁</span><strong>Pronto pra passear?</strong><small>Toque em pular ou use a barra de espaço.</small><button id="petCarStart" type="button">Começar passeio</button></div><div id="petCarScore" class="pet-car-score">0 m</div></div>
+    <div class="pet-game-controls"><button id="petCarJump" type="button" aria-label="Pular">⤴ <span>Pular</span></button><p>Desvie dos brinquedos e tente bater seu recorde!</p><button id="petCarRestart" type="button" hidden>Recomeçar ↻</button></div>
+  </section>
+</section>
+
+<dialog id="calendarEventDialog" class="calendar-dialog" aria-labelledby="calendarDialogTitle">
+  <form id="calendarEventForm" method="dialog">
+    <div class="calendar-dialog-heading"><div><span class="section-label">SAVE THE DATE</span><h2 id="calendarDialogTitle">Add a little plan</h2></div><button id="calendarDialogClose" type="button" aria-label="Fechar">×</button></div>
+    <label>What’s the plan?<input id="calendarEventTitle" maxlength="80" required placeholder="Dinner, trip, birthday…"></label>
+    <label>Date<input id="calendarEventDate" type="date" required></label>
+    <label>Type<select id="calendarEventType"><option value="plan">Little plan</option><option value="birthday">Birthday</option><option value="anniversary">Anniversary</option><option value="trip">Trip</option></select></label>
+    <label class="calendar-repeat"><input id="calendarEventAnnual" type="checkbox"> Repeat every year</label>
+    <label>Note <span>(optional)</span><textarea id="calendarEventNote" maxlength="240" rows="2" placeholder="Anything to remember?"></textarea></label>
+    <button class="calendar-save" type="submit">Save event</button><p id="calendarFormStatus" role="status"></p>
+  </form>
+</dialog>
 
 <dialog id="timelinePhotoDialog" class="timeline-photo-dialog" aria-labelledby="timelinePhotoDialogTitle"><div class="timeline-photo-dialog-head"><div><span class="section-label">OUR PHOTOS</span><h2 id="timelinePhotoDialogTitle">Escolha uma lembrança</h2></div><button type="button" id="closeTimelinePhotoDialog" aria-label="Fechar galeria">×</button></div><div id="timelinePhotoChoices" class="timeline-photo-choices"></div></dialog>
 
@@ -799,6 +822,8 @@
     </article>
 </div>
 
+<div id="storyCat" class="story-cat" role="img" aria-label="O gatinho está passeando pelo site"><img class="story-cat-photo" src="images/web/our-cat.jpg" alt=""><span class="story-cat-spark" aria-hidden="true">✦</span><span id="storyCatBubble" class="story-cat-bubble" role="status" aria-live="polite">Oi! Quer brincar?</span></div>
+
 
 
 <!-- ================= FOOTER ================= -->
@@ -818,10 +843,8 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="cloudflare-config.js"></script>
 <script src="supabase-config.js"></script>
-<script src="script.js?v=20261027-countdowns-settings"></script>
-<script src="location.js"></script>
+<script src="script.js?v=20261112-glass-rose"></script>
 
 </body>
 </html>
